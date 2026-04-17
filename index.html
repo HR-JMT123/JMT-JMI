@@ -1,0 +1,2710 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบซื้อประกันการทำงาน JMI</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+      font-weight: 300; 
+      background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+      min-height: 100vh;
+      padding: 30px 15px;
+      color: #333;
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.5);
+      padding: 40px;
+      width: 100%;
+      margin: 0 auto;
+      transition: all 0.3s ease;
+    }
+
+    .login-card { max-width: 450px; margin-top: 5vh; }
+    .form-card { max-width: 800px; display: none; } 
+    .table-card { max-width: 1250px; display: none; margin-top: 20px; padding: 30px; } 
+    .hr-card { max-width: 100%; display: none; margin-top: 20px; padding: 30px; } 
+
+    .logo-icon {
+      font-size: 3.5rem;
+      color: #4e54c8;
+      margin-bottom: 10px;
+    }
+
+    .form-control {
+      border-radius: 10px;
+      padding: 12px 15px;
+      border: 1px solid #ced4da;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus {
+      box-shadow: 0 0 0 0.25rem rgba(78, 84, 200, 0.25);
+      border-color: #4e54c8;
+    }
+
+    .readonly-field {
+      background-color: #f4f6f9;
+      color: #6c757d;
+      border: 1px dashed #ced4da;
+    }
+
+    .btn-primary-custom {
+      background: linear-gradient(45deg, #4e54c8, #8f94fb);
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(78, 84, 200, 0.4);
+    }
+
+    .btn-success-custom {
+      background: linear-gradient(45deg, #11998e, #38ef7d);
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-success-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(17, 153, 142, 0.4);
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #4e54c8;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      margin-top: 30px;
+    }
+
+    .input-group-text {
+      background-color: white;
+      border-radius: 10px 0 0 10px;
+      border-right: none;
+    }
+    .input-group .form-control {
+      border-left: none;
+    }
+
+    .custom-table-container {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+      background-color: white;
+    }
+    
+    .custom-table th {
+      background-color: #4e54c8;
+      color: #ffffff;
+      font-weight: 400; 
+      font-size: 0.85rem; 
+      vertical-align: middle;
+    }
+    .custom-table tbody td {
+      font-weight: 300; 
+      font-size: 0.85rem; 
+      vertical-align: middle;
+    }
+    
+    /* --- ปรับแต่ง UI ตามที่รีเควสใหม่ --- */
+    
+    /* 1. จัดการคอลัมน์สถานะและเอกสาร ให้ Badge มีความกว้างคงที่ */
+    .status-badge {
+      display: inline-block;
+      width: 130px; /* กำหนดความกว้างตายตัว เพื่อให้เท่ากันทุกแถว */
+      text-align: center;
+      font-weight: 400;
+      font-size: 0.75rem;
+      padding: 6px 12px;
+    }
+    
+    .doc-badge {
+      display: inline-block;
+      width: 120px; /* กำหนดความกว้างตายตัว */
+      text-align: center;
+      font-weight: 400;
+      font-size: 0.75rem;
+      padding: 6px 12px;
+    }
+
+    /* 2. จัดการคอลัมน์เอกสาร ให้ Badge อยู่ซ้าย ไอคอนอยู่ขวา */
+    .doc-cell-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 0 5px;
+    }
+    
+    /* 3. จัดการคอลัมน์วันที่ให้ไม่ตัดบรรทัด (No Wrap) */
+    .date-cell-wrapper {
+      display: flex;
+      align-items: center;
+      white-space: nowrap; /* ป้องกันการขึ้นบรรทัดใหม่ */
+      text-align: left;
+    }
+    
+    /* เว้นระยะ Checkbox */
+    .table .form-check-input {
+      border: 2px solid #8c90c7;
+      width: 1.1em;
+      height: 1.1em;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      transition: all 0.2s ease-in-out;
+      margin-top: 0;
+      margin-right: 8px; /* เพิ่มระยะห่างขวา */
+    }
+    
+    /* ----------------------------------- */
+
+    .table .form-check-input:checked {
+      background-color: #4e54c8;
+      border-color: #4e54c8;
+    }
+    .table .form-check-input:hover {
+      border-color: #4e54c8;
+    }
+    
+    .custom-table tbody tr {
+      transition: background-color 0.2s;
+    }
+    .custom-table tbody tr:hover {
+      background-color: #f1f3ff; 
+    }
+    
+    .custom-table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+    .custom-table-container::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 10px; }
+
+    .col-filter {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      margin-top: 8px;
+      font-weight: normal;
+      border-radius: 5px;
+      width: 100%;
+    }
+    
+    .email-tab-link {
+        color: #4e54c8 !important;
+        font-weight: 600 !important;
+        border: 2px solid #4e54c8 !important;
+        border-bottom: none !important;
+        border-radius: 10px 10px 0 0 !important;
+        background-color: #f8f9fa !important;
+        margin-right: 5px;
+        transition: all 0.3s ease;
+    }
+    .email-tab-link.active {
+        background-color: #4e54c8 !important;
+        color: white !important;
+    }
+    .email-tab-link:not(.active):hover {
+        background-color: #eef2ff !important;
+    }
+
+    .auto-set-card {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background-color: #fff;
+      transition: box-shadow 0.2s;
+    }
+    .auto-set-card:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="glass-card login-card text-center" id="loginSection">
+    <i class="bi bi-shield-lock-fill logo-icon"></i>
+    <h3 class="mb-2 fw-bold">เข้าสู่ระบบ</h3>
+    <p class="text-muted mb-4">ระบบจัดการซื้อประกันการทำงาน JMI</p>
+    
+    <div class="input-group mb-4 text-start">
+      <span class="input-group-text"><i class="bi bi-person-badge text-primary"></i></span>
+      <input type="text" id="loginIdCard" class="form-control" placeholder="ระบุเลข ID Card ของท่าน" autocomplete="off">
+    </div>
+    
+    <button class="btn btn-primary-custom btn-primary w-100 text-white" id="btnLogin" onclick="handleLogin()">
+      <span id="loginText">เข้าสู่ระบบ</span>
+      <span id="loginLoader" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+    </button>
+</div>
+
+<div class="glass-card form-card" id="insuranceForm">
+    <div class="text-center mb-4 position-relative">
+      <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 position-absolute top-0 end-0 mt-2" onclick="logoutSystem()">
+        <i class="bi bi-box-arrow-right me-1"></i>ออก
+      </button>
+
+      <i class="bi bi-clipboard2-check-fill logo-icon" style="color: #11998e;"></i>
+      <h3 class="fw-bold">ฟอร์มซื้อประกันการทำงาน</h3>
+      <p class="text-muted">กรุณาตรวจสอบข้อมูลและกรอกรายละเอียดให้ครบถ้วน</p>
+    </div>
+
+    <form id="myForm" onsubmit="event.preventDefault(); handleSubmit();">
+      <div class="section-title" style="margin-top: 0;"><i class="bi bi-person-lines-fill me-2"></i>ข้อมูลพนักงาน (จากระบบ)</div>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small text-muted">ID Card</label>
+          <input type="text" id="idCard" name="idCard" class="form-control readonly-field" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small text-muted">รหัสพนักงาน</label>
+          <input type="text" id="empId" name="empId" class="form-control readonly-field" readonly>
+        </div>
+        <div class="col-md-12">
+          <label class="form-label small text-muted">ชื่อ-นามสกุล</label>
+          <input type="text" id="name" name="name" class="form-control readonly-field" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small text-muted">ตำแหน่ง</label>
+          <input type="text" id="position" name="position" class="form-control readonly-field" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small text-muted">สังกัด / แผนก</label>
+          <input type="text" id="department" name="department" class="form-control readonly-field" readonly>
+        </div>
+      </div>
+
+      <div class="section-title"><i class="bi bi-pencil-square me-2"></i>ข้อมูลการทำประกัน</div>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">วันเดือนปีเกิด <span class="text-danger">*</span></label>
+          <input type="date" id="dob" name="dob" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
+          <input type="text" id="tel" name="tel" class="form-control" placeholder="08X-XXX-XXXX" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">ที่อยู่ปัจจุบัน <span class="text-danger">*</span></label>
+          <textarea id="address" name="address" class="form-control" rows="2" placeholder="บ้านเลขที่, หมู่, ตำบล, อำเภอ, จังหวัด..." required></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">วันเริ่มงาน <span class="text-danger">*</span></label>
+          <input type="date" id="startDate" name="startDate" class="form-control readonly-field" readonly required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">สาขา <span class="text-danger">*</span></label>
+          <input type="text" id="branch" name="branch" class="form-control" placeholder="ระบุสาขา" required>
+        </div>
+      </div>
+
+      <div class="section-title"><i class="bi bi-folder-symlink-fill me-2"></i>เอกสารอ้างอิง (แนบไฟล์ / ถ่ายภาพ)</div>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label small">ใบคำขอซื้อ <span class="text-danger">*</span></label>
+          <input type="file" id="reqForm" name="reqForm" class="form-control" accept="image/*,application/pdf" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small">สลิปโอนเงิน <span class="text-danger">*</span> <small class="text-muted">(แนบได้ 1-2 ไฟล์)</small></label>
+          <input type="file" id="slip" name="slip" class="form-control mb-2" accept="image/*,application/pdf" required>
+          <input type="file" id="slip2" name="slip2" class="form-control" accept="image/*,application/pdf" title="สลิปที่ 2 (ถ้ามี)">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small">สำเนาบัตรประชาชน <span class="text-danger">*</span></label>
+          <input type="file" id="idCopy" name="idCopy" class="form-control" accept="image/*,application/pdf" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small">หน้าสมุดบัญชี (BB)</label>
+          <input type="file" id="bankBook" name="bankBook" class="form-control" accept="image/*,application/pdf">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small">เอกสารอื่นๆ (ถ้ามี)</label>
+          <input type="file" id="otherDoc" name="otherDoc" class="form-control" accept="image/*,application/pdf">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success-custom btn-success w-100 text-white" id="submitBtn">
+        <i class="bi bi-cloud-arrow-up-fill me-2" id="submitIcon"></i>
+        <span id="submitText">บันทึกข้อมูลการซื้อประกัน</span>
+        <span id="submitLoader" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+      </button>
+    </form>
+</div>
+
+<div class="glass-card table-card" id="tableSection">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 mt-0">
+        <div class="section-title border-bottom-0 mb-0 mt-0"><i class="bi bi-table me-2"></i>รายการซื้อค้ำประกันของคุณ</div>
+    </div>
+    <p class="text-muted small mb-3"><i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดเพิ่มเติม</p>
+    <div class="custom-table-container table-responsive">
+      <table class="table custom-table table-bordered align-middle text-center mb-0">
+        <thead>
+          <tr>
+            <th width="14%">วันที่บันทึก</th>
+            <th width="14%">เริ่มคุ้มครอง</th>
+            <th width="14%">สิ้นสุดคุ้มครอง</th>
+            <th width="14%">วันที่ออกประกัน</th>
+            <th width="14%">วันคงเหลือ <i class="bi bi-sort-numeric-down ms-1" id="sortIconUser" style="cursor:pointer;" onclick="sortUserTable()" title="เรียงลำดับ"></i></th>
+            <th width="15%">สถานะ</th>
+            <th width="15%">เอกสาร</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+    </div>
+</div>
+
+<div class="glass-card hr-card" id="hrSection">
+    <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-4 mt-2">
+       <div class="section-title border-bottom-0 mb-0 mt-0" id="adminSectionTitle"><i class="bi bi-people-fill me-2"></i>ระบบจัดการสำหรับ HR</div>
+       <div class="d-flex align-items-center gap-2 mt-2 mt-md-0" id="hrButtonsContainer">
+           <span class="badge bg-primary rounded-pill px-3 py-2" id="hrTotalCount">รวม 0 รายการ</span>
+           
+           <button type="button" id="btnApproveInAll" class="btn btn-sm btn-info text-white rounded-pill px-3" style="display:none;" onclick="approveAllInsuranceIn()" title="เลือกอนุมัติรอแจ้งเข้าที่มีสลิปถูกต้อง"><i class="bi bi-check-all me-1"></i>อนุมัติแจ้งเข้า All</button>
+           <button type="button" id="btnCancelSelectIn" class="btn btn-sm btn-secondary text-white rounded-pill px-3" style="display:none;" onclick="cancelSelectModeIn()">ยกเลิก</button>
+
+           <button type="button" id="btnApproveOutAll" class="btn btn-sm btn-danger text-white rounded-pill px-3" style="display:none;" onclick="approveAllInsuranceOut()" title="เลือกอนุมัติรอแจ้งออกทั้งหมด"><i class="bi bi-check-all me-1"></i>อนุมัติแจ้งออก All</button>
+           <button type="button" id="btnCancelSelectOut" class="btn btn-sm btn-secondary text-white rounded-pill px-3" style="display:none;" onclick="cancelSelectModeOut()">ยกเลิก</button>
+
+           <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="fetchHRTableData()" title="รีเฟรชข้อมูล"><i class="bi bi-arrow-clockwise me-1"></i>รีเฟรช</button>
+           <button type="button" id="btnSendEmail" class="btn btn-sm btn-primary rounded-pill px-3" onclick="openEmailModal()" title="ตั้งค่า/ส่งรายงานผ่าน Email"><i class="bi bi-envelope-fill me-1"></i>ส่ง/ตั้งค่า Email</button>
+           <button type="button" id="btnEmailHistory" class="btn btn-sm btn-info text-white rounded-pill px-3" style="display:none;" onclick="openEmailHistoryModal()" title="ประวัติการส่งอีเมล"><i class="bi bi-clock-history me-1"></i>ประวัติอีเมล</button>
+           <button type="button" id="btnExportExcel" class="btn btn-sm btn-success rounded-pill px-3" onclick="exportExcel()"><i class="bi bi-file-earmark-excel me-1"></i>Export Excel</button>
+           <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="logoutSystem()"><i class="bi bi-box-arrow-right me-1"></i>ออก</button>
+       </div>
+    </div>
+    
+    <div class="row mb-3 align-items-end g-3">
+        <div class="col-lg-6 col-md-12">
+            <label class="small text-muted mb-1 d-block"><i class="bi bi-funnel"></i> ตัวกรองสถานะ:</label>
+            <div class="btn-group w-100" role="group">
+              <button type="button" class="btn btn-primary active" id="btnStatusAll" onclick="filterByStatus('ทั้งหมด', this)">ทั้งหมด</button>
+              <button type="button" class="btn btn-outline-info text-dark" id="btnStatusWait" onclick="filterByStatus('รอแจ้งเข้าประกัน', this)">รอแจ้งเข้า</button>
+              <button type="button" class="btn btn-outline-warning text-dark" id="btnStatusIn" onclick="filterByStatus('แจ้งเข้าแล้ว', this)">แจ้งเข้าแล้ว</button>
+              <button type="button" class="btn btn-outline-danger" id="btnStatusWaitOut" onclick="filterByStatus('รอแจ้งออก', this)">รอแจ้งออก</button>
+              <button type="button" class="btn btn-outline-dark" id="btnStatusOut" onclick="filterByStatus('แจ้งออกแล้ว', this)">แจ้งออกแล้ว</button>
+              <button type="button" class="btn btn-outline-secondary" id="btnStatusExp" onclick="filterByStatus('หมดอายุประกัน', this)">หมดอายุ</button>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-12 text-lg-end text-start">
+            <div class="d-inline-flex align-items-center gap-2 mb-1">
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 me-2" onclick="clearAllFilters()" title="เคลียร์ตัวกรอง" style="font-size: 0.8rem;"><i class="bi bi-eraser me-1"></i>เคลียร์</button>
+                <i class="bi bi-calendar-range text-muted"></i>
+                <select id="dateFilterType" class="form-select form-select-sm border-0 shadow-none p-0 text-muted small fw-bold" style="width: auto; cursor: pointer; padding-left: 0 !important;" onchange="applyAllFilters()">
+                    <option value="0">กรองจาก วันที่บันทึก:</option>
+                    <option value="3">กรองจาก เริ่มคุ้มครอง:</option>
+                    <option value="4">กรองจาก สิ้นสุดคุ้มครอง:</option>
+                    <option value="7">กรองจาก วันที่ออกประกัน:</option>
+                </select>
+                </div>
+            <div class="d-flex justify-content-lg-end align-items-center gap-2">
+                <input type="date" id="dateStart" class="form-control form-control-sm" style="width: 130px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
+                <span class="text-muted">-</span>
+                <input type="date" id="dateEnd" class="form-control form-control-sm" style="width: 130px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
+            </div>
+        </div>
+    </div>
+
+    <p class="text-muted small mb-2" id="hrInstructionText"><i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดและจัดการสถานะการแจ้งออก | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล</p>
+    <div class="custom-table-container table-responsive shadow-sm" style="max-height: 600px; overflow-y: auto;">
+      <table class="table custom-table table-bordered align-middle text-center mb-0" id="hrTable">
+        <thead style="position: sticky; top: 0; z-index: 2; background-color: #4e54c8;">
+          <tr>
+            <th width="14%" id="thTimestamp">
+                <div class="date-cell-wrapper">
+                    <input type="checkbox" id="selectAllMain" class="form-check-input" onchange="toggleSelectAllMain(this)"> วันที่บันทึก
+                </div>
+            </th>
+            <th width="9%">รหัสพนักงาน<br><input type="text" class="form-control form-control-sm col-filter" data-col="1" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
+            <th width="12%">ชื่อ-นามสกุล<br><input type="text" class="form-control form-control-sm col-filter" data-col="2" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
+            <th width="10%">เริ่มคุ้มครอง</th>
+            <th width="10%">สิ้นสุดคุ้มครอง</th>
+            <th width="10%">วันคงเหลือ <i class="bi bi-sort-numeric-down ms-1" id="sortIconHR" style="cursor:pointer;" onclick="sortHRTable()" title="เรียงลำดับ"></i><br><input type="text" class="form-control form-control-sm col-filter" data-col="5" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
+            <th width="10%">สถานะ</th>
+            <th width="10%">วันที่ออกประกัน</th>
+            <th width="15%">เอกสาร<br>
+              <select class="form-select form-select-sm col-filter" data-col="8" onchange="applyAllFilters()">
+                <option value="">ทั้งหมด</option>
+                <option value="ข้อมูลครบถ้วน">ข้อมูลครบถ้วน</option>
+                <option value="ข้อมูลไม่ครบ">ข้อมูลไม่ครบ</option>
+                <option value="สลิปโอนเงินถูกต้อง">สลิปถูกต้อง</option>
+                <option value="สลิปโอนเงินไม่ถูกต้อง">สลิปไม่ถูกต้อง</option>
+              </select>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="hrTableBody">
+        </tbody>
+      </table>
+    </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(45deg, #4e54c8, #8f94fb); color: white;">
+          <h5 class="modal-title" id="detailModalLabel"><i class="bi bi-card-checklist me-2"></i>รายละเอียดการซื้อประกัน</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="detailModalBody">
+        </div>
+        <div class="modal-footer" id="detailModalFooter">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+              <div class="modal-header" style="background: #6c7cf6; color: white;">
+                  <h5 class="modal-title" id="emailModalLabel"><i class="bi bi-envelope-cog me-2"></i>จัดการตั้งค่าและส่งรายงานอีเมล</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body p-0" style="background: #eef2ff;">
+                  <div class="row m-0">
+                      <div id="emailFormArea" class="col-lg-12 p-0 d-flex flex-column" style="min-height: 600px; transition: width 0.3s ease;">
+                          <ul class="nav nav-tabs border-bottom-0 pt-2 px-2" id="emailTab" role="tablist">
+                              <li class="nav-item" role="presentation">
+                                  <button class="nav-link active email-tab-link w-100 px-4" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-pane" type="button" role="tab" onclick="toggleEmailView('manual')"><i class="bi bi-send me-1"></i> ส่งอีเมลทันที (Manual)</button>
+                              </li>
+                              <li class="nav-item" role="presentation">
+                                  <button class="nav-link email-tab-link w-100 px-4" id="auto-tab" data-bs-toggle="tab" data-bs-target="#auto-pane" type="button" role="tab" onclick="toggleEmailView('auto'); resetAutoForm();"><i class="bi bi-robot me-1"></i> สร้าง/แก้ไข ส่งอัตโนมัติ</button>
+                              </li>
+                          </ul>
+                          
+                          <div class="tab-content bg-white p-3 rounded-bottom flex-grow-1" id="emailTabContent">
+                              <div class="tab-pane fade show active" id="manual-pane" role="tabpanel">
+                                  <div class="mb-3">
+                                      <label class="form-label text-muted small fw-bold">ถึง (อีเมลผู้รับ)</label>
+                                      <div id="manualEmailRecipientsContainer">
+                                          <div class="input-group mb-2 email-row">
+                                              <input type="email" class="form-control manual-email-input" placeholder="example@gmail.com">
+                                          </div>
+                                      </div>
+                                      <button type="button" class="btn btn-sm btn-outline-primary" style="border-radius: 5px;" onclick="addEmailField('manual')"><i class="bi bi-plus-circle"></i> เพิ่มผู้รับ</button>
+                                  </div>
+                                  <div class="mb-3">
+                                      <label class="form-label text-muted small fw-bold">เรื่อง</label>
+                                      <input type="text" id="manualEmailSubject" class="form-control" placeholder="รายงานข้อมูลประกันระบบ JMI...">
+                                  </div>
+                                  
+                                  <div class="mb-3 p-3 bg-light rounded border">
+                                      <label class="form-label small text-muted fw-bold"><i class="bi bi-layout-three-columns text-primary"></i> เลือกหัวข้อข้อมูลที่ต้องการส่ง</label>
+                                      <div id="manualColumns" class="row g-2 mt-1"></div>
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label class="form-label text-muted small fw-bold">ข้อความเพิ่มเติม (ตัวเลือก)</label>
+                                      <textarea id="manualEmailBody" class="form-control" rows="3" placeholder="พิมพ์ข้อความที่ต้องการส่งไปพร้อมกับอีเมล..."></textarea>
+                                  </div>
+                                  <div class="text-end mt-4 pt-3 border-top">
+                                      <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ปิด</button>
+                                      <button type="button" class="btn btn-info px-4 text-white me-2" onclick="previewExcel()"><i class="bi bi-file-earmark-excel me-1"></i> ดู Excel ก่อนส่ง</button>
+                                      <button type="button" class="btn btn-primary px-4" onclick="sendManualEmail()"><i class="bi bi-send me-1"></i> ยืนยันส่ง</button>
+                                  </div>
+                              </div>
+                              
+                              <div class="tab-pane fade" id="auto-pane" role="tabpanel">
+                                  <input type="hidden" id="editAutoSetId" value="">
+                                  <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                      <h6 class="fw-bold m-0 text-primary" id="autoFormTitle"><i class="bi bi-plus-circle"></i> สร้างการตั้งค่าใหม่</h6>
+                                      <div>
+                                          <button type="button" class="btn btn-sm btn-outline-danger me-2 d-none" id="btnDisableAll" onclick="disableAutoEmail()">ปิดใช้งานทั้งหมด</button>
+                                          <button type="button" class="btn btn-sm btn-outline-secondary d-none" id="btnCancelEdit" onclick="resetAutoForm()">ยกเลิกการแก้ไข</button>
+                                      </div>
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label class="form-label text-muted small fw-bold">ชื่อเซ็ตการตั้งค่า (ช่วยจำ)</label>
+                                      <input type="text" id="autoSetName" class="form-control" placeholder="เช่น แจ้งเข้าฝ่ายผลิต, เตือนใกล้หมดอายุ..." required>
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label class="form-label text-muted small fw-bold">ถึง (อีเมลผู้รับ)</label>
+                                      <div id="autoEmailRecipientsContainer">
+                                          <div class="input-group mb-2 email-row">
+                                              <input type="email" class="form-control auto-email-input" placeholder="example@gmail.com">
+                                          </div>
+                                      </div>
+                                      <button type="button" class="btn btn-sm btn-outline-primary" style="border-radius: 5px;" onclick="addEmailField('auto')"><i class="bi bi-plus-circle"></i> เพิ่มผู้รับ</button>
+                                  </div>
+                                  <div class="mb-3">
+                                      <label class="form-label text-muted small fw-bold">เรื่อง (Subject)</label>
+                                      <input type="text" id="autoEmailSubject" class="form-control" placeholder="รายงานข้อมูลประกันระบบ JMI...">
+                                  </div>
+                                  
+                                  <div class="p-3 bg-light rounded border mb-3">
+                                      <div class="row g-3">
+                                          <div class="col-md-12">
+                                              <label class="form-label small text-muted fw-bold">เลือกสถานะที่ต้องการกรอง</label>
+                                              <div class="d-flex flex-wrap gap-2" id="autoStatusCheckboxes">
+                                                  <div class="form-check"><input class="form-check-input status-cb-auto" type="checkbox" value="รอแจ้งเข้าประกัน" id="scb1"><label class="form-check-label small" for="scb1">รอแจ้งเข้า</label></div>
+                                                  <div class="form-check"><input class="form-check-input status-cb-auto" type="checkbox" value="แจ้งเข้าแล้ว" id="scb2"><label class="form-check-label small" for="scb2">แจ้งเข้าแล้ว</label></div>
+                                                  <div class="form-check"><input class="form-check-input status-cb-auto" type="checkbox" value="รอแจ้งออก" id="scb3"><label class="form-check-label small" for="scb3">รอแจ้งออก</label></div>
+                                                  <div class="form-check"><input class="form-check-input status-cb-auto" type="checkbox" value="แจ้งออกแล้ว" id="scb4"><label class="form-check-label small" for="scb4">แจ้งออกแล้ว</label></div>
+                                                  <div class="form-check"><input class="form-check-input status-cb-auto" type="checkbox" value="หมดอายุประกัน" id="scb5"><label class="form-check-label small" for="scb5">หมดอายุประกัน</label></div>
+                                              </div>
+                                          </div>
+                                          <div class="col-md-12">
+                                              <label class="form-label small text-muted fw-bold">เงื่อนไขเพิ่มเติม (การคำนวณวัน)</label>
+                                              <select id="autoConditionType" class="form-select form-select-sm border-primary text-primary fw-bold">
+                                                  <option value="STATUS">ไม่ต้องคำนวณ (ใช้เฉพาะสถานะที่เลือกข้างบน)</option>
+                                                  <option value="EXPIRY">กรองตามวันหมดอายุประกันด้วย (เช่น เหลือน้อยกว่า 30 วัน)</option>
+                                              </select>
+                                          </div>
+                                          <div class="col-md-12 mt-2">
+                                              <label class="form-label small text-muted">กรองวันคงเหลือน้อยกว่าหรือเท่ากับ (วัน)</label>
+                                              <input type="number" id="autoDaysLimit" class="form-control form-control-sm" placeholder="เว้นว่างไว้หากต้องการส่งทั้งหมดที่เข้าเงื่อนไข">
+                                              <small class="text-muted" style="font-size: 0.75rem;">เช่น ใส่ 40 เพื่อส่งเฉพาะคนที่เหลือไม่เกิน 40 วัน</small>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div class="row g-2 mb-3">
+                                      <div class="col-md-6">
+                                          <label class="form-label small text-muted fw-bold">ความถี่การส่ง</label>
+                                          <div class="d-flex flex-column gap-2">
+                                              <select id="autoFreqType" class="form-select form-select-sm" onchange="updateFreqOptions()">
+                                                  <option value="DAILY">ทุกวัน</option>
+                                                  <option value="WEEKLY">ทุกสัปดาห์ (ระบุวัน)</option>
+                                                  <option value="MONTHLY">ทุกเดือน (ระบุวันที่)</option>
+                                              </select>
+                                              <div id="autoFreqValueContainer" style="display:none; width: 100%;"></div>
+                                          </div>
+                                      </div>
+                                      <div class="col-md-6">
+                                          <label class="form-label small text-muted fw-bold">เวลาที่ส่ง (โดยประมาณ)</label>
+                                          <input type="time" id="autoTime" class="form-control form-control-sm" value="11:00">
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="mb-3 p-3 bg-light rounded border">
+                                      <label class="form-label small text-muted fw-bold"><i class="bi bi-layout-three-columns text-primary"></i> เลือกหัวข้อข้อมูลที่ต้องการส่ง</label>
+                                      <div id="autoColumns" class="row g-2 mt-1"></div>
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label class="form-label text-muted small fw-bold">ข้อความเพิ่มเติม (ตัวเลือก)</label>
+                                      <textarea id="autoEmailBody" class="form-control" rows="2" placeholder="พิมพ์ข้อความที่ต้องการส่งไปพร้อมกับอีเมล..."></textarea>
+                                  </div>
+                                  
+                                  <div class="text-end mt-4 pt-3 border-top">
+                                      <button type="button" class="btn btn-success px-4 w-100" id="btnSaveAutoSet" onclick="saveAutoSetting()"><i class="bi bi-save me-1"></i> บันทึกและเปิดใช้งานเซ็ตนี้</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      
+                      <div id="autoSettingsSidebar" class="col-lg-4 p-0 bg-light flex-column" style="min-height: 600px; display: none;">
+                          <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center">
+                              <h6 class="fw-bold text-primary m-0"><i class="bi bi-list-task"></i> รายการตั้งค่าอัตโนมัติ</h6>
+                              <span class="badge bg-secondary rounded-pill" id="autoSetCountBadge">0 เซ็ต</span>
+                          </div>
+                          <div class="p-3 flex-grow-1" id="savedAutoSetsContainer" style="overflow-y: auto; background-color: #f8f9fa;">
+                              <div class="text-center text-muted my-5">
+                                  <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div><br>
+                                  <small>กำลังโหลดข้อมูล...</small>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="modal fade" id="emailHistoryModal" tabindex="-1" aria-labelledby="emailHistoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+              <div class="modal-header" style="background: #17a2b8; color: white;">
+                  <h5 class="modal-title" id="emailHistoryModalLabel"><i class="bi bi-clock-history me-2"></i>ประวัติการส่งรายงานอีเมล</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body p-0">
+                  <div class="table-responsive" style="max-height: 500px;">
+                      <table class="table table-hover table-bordered mb-0 text-center align-middle" style="font-size: 0.9rem;">
+                          <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">
+                              <tr>
+                                  <th width="15%">วัน-เวลาที่ส่ง</th>
+                                  <th width="10%">ประเภท</th>
+                                  <th width="15%">ผู้รับ</th>
+                                  <th width="20%">หัวเรื่อง</th>
+                                  <th width="15%">สถานะข้อมูลที่ส่ง</th>
+                                  <th width="15%">ผลลัพธ์</th>
+                                  <th width="10%">ไฟล์อ้างอิง</th>
+                              </tr>
+                          </thead>
+                          <tbody id="emailHistoryBody">
+                              <tr><td colspan="7" class="py-4 text-muted"><div class="spinner-border spinner-border-sm text-info me-2" role="status"></div>กำลังโหลดข้อมูล...</td></tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="modal fade" id="previewExcelModal" tabindex="-1" aria-labelledby="previewExcelModalLabel" aria-hidden="true" style="z-index: 1060;">
+      <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+              <div class="modal-header bg-info text-white">
+                  <h5 class="modal-title" id="previewExcelModalLabel"><i class="bi bi-file-earmark-excel me-2"></i>ตัวอย่างไฟล์ Excel ก่อนส่ง</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body p-3" id="previewExcelBody" style="background-color: #fff; overflow-x: auto;">
+                  </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <form id="missingUploadForm" style="display: none;">
+      <input type="hidden" name="rowNumber" id="missingRowNumber">
+      <input type="file" name="missingBankBook" id="missingBankBookInput" accept="image/*,application/pdf" onchange="submitMissingUpload()">
+  </form>
+  
+  <form id="missingSlipUploadForm" style="display: none;">
+      <input type="hidden" name="rowNumber" id="missingSlipRowNumber">
+      <input type="file" name="missingSlip" id="missingSlipInput" accept="image/*,application/pdf" onchange="submitMissingSlipUpload()">
+  </form>
+
+  <form id="missingOtherDocUploadForm" style="display: none;">
+      <input type="hidden" name="rowNumber" id="missingOtherDocRowNumber">
+      <input type="file" name="missingOtherDoc" id="missingOtherDocInput" accept="image/*,application/pdf" onchange="submitMissingOtherDocUpload()">
+  </form>
+
+  <script>
+    // =====================================================================
+    // 🚀 บริจด์เชื่อมต่อ GitHub <-> Google Apps Script (ห้ามลบ)
+    // ⚠️ ต้องนำ URL ของ Web App (ที่ Deploy เป็น Anyone) มาใส่ที่นี่
+    // =====================================================================
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw07729mg81-0XX8EHITkqc0g4uBuP4E1QNOYikytMtb2I__-9lBcr6WPu_9yCAcc6x/exec"; 
+
+    const google = {
+      script: {
+        run: new Proxy({}, {
+          get: function(target, prop) {
+            if (prop === 'withSuccessHandler') return function(cb) { return createRunner({ onSuccess: cb }); };
+            if (prop === 'withFailureHandler') return function(cb) { return createRunner({ onFailure: cb }); };
+            return createRunner({})[prop];
+          }
+        })
+      }
+    };
+
+    function createRunner(handlers) {
+      return new Proxy({}, {
+        get: function(target, funcName) {
+          if (funcName === 'withSuccessHandler') return function(cb) { handlers.onSuccess = cb; return createRunner(handlers); };
+          if (funcName === 'withFailureHandler') return function(cb) { handlers.onFailure = cb; return createRunner(handlers); };
+
+          return async function(...args) {
+            try {
+              let processedArgs = [];
+              for (let arg of args) {
+                if (arg instanceof HTMLFormElement) {
+                  let formDataObj = {};
+                  for (let el of arg.elements) {
+                    if (!el.name) continue;
+                    if (el.type === 'file' && el.files.length > 0) {
+                      let file = el.files[0];
+                      let base64 = await readFileAsBase64(file);
+                      formDataObj[el.name] = { isBlob: true, name: file.name, mimeType: file.type, data: base64.split(',')[1] };
+                    } else if (el.type === 'file') {
+                      formDataObj[el.name] = "";
+                    } else {
+                      formDataObj[el.name] = el.value;
+                    }
+                  }
+                  processedArgs.push(formDataObj);
+                } else {
+                  processedArgs.push(arg);
+                }
+              }
+
+              const response = await fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ functionName: funcName, arguments: processedArgs })
+              });
+              
+              const data = await response.json();
+              if (data.success === false) {
+                if (handlers.onFailure) handlers.onFailure(data.error);
+                else console.error("GAS Error:", data.error);
+              } else {
+                if (handlers.onSuccess) handlers.onSuccess(data.result);
+              }
+            } catch (err) {
+              if (handlers.onFailure) handlers.onFailure(err);
+              else console.error("Fetch Error:", err);
+            }
+          };
+        }
+      });
+    }
+
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+    // =====================================================================
+
+    var currentUserLevel = '';
+    var currentRecords = [];
+    var currentStatusFilter = 'ทั้งหมด'; 
+    var isCurrentUserHR = false; 
+
+    const AVAILABLE_COLUMNS = [
+        { id: 'idCard', label: 'ID Card' }, { id: 'empId', label: 'Employee ID' },
+        { id: 'name', label: 'Name' }, { id: 'position', label: 'Position' },
+        { id: 'company', label: 'Company' }, { id: 'empStatus', label: 'Employee Status' },
+        { id: 'dob', label: 'วดป เกิด' }, { id: 'tel', label: 'Tel' },
+        { id: 'address', label: 'ที่อยู่' }, { id: 'branch', label: 'สาขา' },
+        { id: 'insuranceType', label: 'ประเภทการซื้อประกัน' }, { id: 'coverageStart', label: 'เริ่มคุ้มครอง' },
+        { id: 'coverageEnd', label: 'สิ้นสุดคุ้มครอง' }, { id: 'cancelDate', label: 'วันที่ออกประกัน' },
+        { id: 'reqFormUrl', label: 'ใบคำขอซื้อ' }, { id: 'slip1', label: 'สลิป1' },
+        { id: 'slip2', label: 'สลิป2' }, { id: 'idCopyUrl', label: 'สำเนาบัตรประชาชน' },
+        { id: 'bankBookUrl', label: 'หน้า BB' }, { id: 'otherDocUrl', label: 'เอกสารอื่นๆ' }
+    ];
+
+    var autoSettingsList = [];
+
+    function initColumnCheckboxes() {
+        let generateHTML = (prefix) => {
+            let html = '';
+            AVAILABLE_COLUMNS.forEach(col => {
+                html += `<div class="col-6 col-md-6 col-lg-4"><div class="form-check"><input class="form-check-input col-cb-${prefix}" type="checkbox" value="${col.id}" id="${prefix}_${col.id}" checked><label class="form-check-label small" for="${prefix}_${col.id}">${col.label}</label></div></div>`;
+            });
+            return html;
+        };
+        if(document.getElementById('manualColumns')) document.getElementById('manualColumns').innerHTML = generateHTML('manual');
+        if(document.getElementById('autoColumns')) document.getElementById('autoColumns').innerHTML = generateHTML('auto');
+    }
+    
+    window.onload = function() {
+        initColumnCheckboxes();
+    };
+
+    function viewDocument(url) {
+        if (!url) return;
+        let embedUrl = url;
+        if (url.indexOf("drive.google.com") !== -1 && url.indexOf("/view") !== -1) {
+            embedUrl = url.replace(/\/view.*/, "/preview");
+        }
+        Swal.fire({
+            html: '<iframe src="' + embedUrl + '" width="100%" height="80vh" style="border:none; min-height: 600px;"></iframe>',
+            showCloseButton: true,
+            showConfirmButton: false,
+            width: '80%',
+            padding: '1em'
+        });
+    }
+
+    var sortDirHR = -1;
+    function sortHRTable() {
+        let tbody = document.getElementById("hrTableBody");
+        let rows = Array.from(tbody.querySelectorAll("tr:not(.no-data-row)"));
+        if(rows.length === 0) return;
+        
+        rows.sort((a, b) => {
+            let valA = parseInt(a.cells[5].innerText);
+            if(isNaN(valA)) {
+                if(a.cells[5].innerText.includes('หมดอายุ')) valA = -1;
+                else if(a.cells[5].innerText.includes('-')) valA = -2;
+                else valA = 0;
+            }
+            let valB = parseInt(b.cells[5].innerText);
+            if(isNaN(valB)) {
+                if(b.cells[5].innerText.includes('หมดอายุ')) valB = -1;
+                else if(b.cells[5].innerText.includes('-')) valB = -2;
+                else valB = 0;
+            }
+            return sortDirHR === 1 ? (valA - valB) : (valB - valA);
+        });
+        
+        let icon = document.getElementById("sortIconHR");
+        if(icon) icon.className = sortDirHR === 1 ? "bi bi-sort-numeric-down ms-1" : "bi bi-sort-numeric-up ms-1";
+        sortDirHR *= -1; 
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    var sortDirUser = -1;
+    function sortUserTable() {
+        let tbody = document.getElementById("tableBody");
+        let rows = Array.from(tbody.querySelectorAll("tr"));
+        if(rows.length === 0 || rows[0].cells.length === 1) return; 
+        
+        rows.sort((a, b) => {
+            let valA = parseInt(a.cells[4].innerText);
+            if(isNaN(valA)) {
+                if(a.cells[4].innerText.includes('หมดอายุ')) valA = -1;
+                else if(a.cells[4].innerText.includes('-')) valA = -2;
+                else valA = 0;
+            }
+            let valB = parseInt(b.cells[4].innerText);
+            if(isNaN(valB)) {
+                if(b.cells[4].innerText.includes('หมดอายุ')) valB = -1;
+                else if(b.cells[4].innerText.includes('-')) valB = -2;
+                else valB = 0;
+            }
+            return sortDirUser === 1 ? (valA - valB) : (valB - valA);
+        });
+        
+        let icon = document.getElementById("sortIconUser");
+        if(icon) icon.className = sortDirUser === 1 ? "bi bi-sort-numeric-down ms-1" : "bi bi-sort-numeric-up ms-1";
+        sortDirUser *= -1;
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    function logoutSystem() {
+        document.getElementById("insuranceForm").style.display = "none";
+        document.getElementById("tableSection").style.display = "none";
+        document.getElementById("hrSection").style.display = "none";
+        document.getElementById("loginSection").style.display = "block";
+        document.getElementById("loginIdCard").value = "";
+        document.getElementById("myForm").reset();
+        
+        ["dob", "tel", "address", "branch"].forEach(id => {
+            let el = document.getElementById(id);
+            if(el) { el.readOnly = false; el.classList.remove("readonly-field"); }
+        });
+        
+        ["reqForm", "slip", "slip2", "idCopy", "bankBook", "otherDoc"].forEach(id => {
+            let el = document.getElementById(id);
+            if(el) { el.disabled = false; }
+        });
+        let submitBtn = document.getElementById("submitBtn");
+        if(submitBtn) { submitBtn.disabled = false; submitBtn.style.display = 'block'; }
+
+        currentRecords = [];
+        currentUserLevel = ''; 
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function handleLogin() {
+      var idCardInput = document.getElementById("loginIdCard").value;
+      if(!idCardInput) {
+        Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณากรอก ID Card ก่อนเข้าสู่ระบบ', confirmButtonColor: '#4e54c8' });
+        return;
+      }
+      
+      document.getElementById("loginText").innerText = " กำลังตรวจสอบ...";
+      document.getElementById("loginLoader").classList.remove("d-none");
+      document.getElementById("btnLogin").disabled = true;
+      
+      google.script.run.withSuccessHandler(function(result) {
+        document.getElementById("loginText").innerText = "เข้าสู่ระบบ";
+        document.getElementById("loginLoader").classList.add("d-none");
+        document.getElementById("btnLogin").disabled = false;
+
+        if(result.success) {
+          Swal.fire({ icon: 'success', title: 'ยินดีต้อนรับ', text: 'คุณ ' + result.name, showConfirmButton: false, timer: 1500 });
+
+          setTimeout(() => {
+            document.getElementById("loginSection").style.display = "none";
+            
+            currentUserLevel = result.level ? result.level.toUpperCase() : "";
+            isCurrentUserHR = (currentUserLevel === 'HR' || currentUserLevel === 'JMI');
+            
+            if (isCurrentUserHR) {
+               document.getElementById("adminSectionTitle").innerHTML = '<i class="bi bi-people-fill me-2"></i>ระบบจัดการสำหรับ ' + currentUserLevel;
+
+               if(currentUserLevel === 'JMI') {
+                   document.getElementById("hrInstructionText").innerHTML = '<i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียด | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล';
+                   document.getElementById("btnApproveInAll").style.display = "none";
+                   document.getElementById("btnApproveOutAll").style.display = "none";
+                   document.getElementById("btnExportExcel").style.display = "none";
+                   document.getElementById("btnSendEmail").style.display = "none";
+                   document.getElementById("btnEmailHistory").style.display = "none";
+                   
+                   if(document.getElementById("btnStatusWait")) document.getElementById("btnStatusWait").style.display = "none";
+                   if(document.getElementById("btnStatusWaitOut")) document.getElementById("btnStatusWaitOut").style.display = "none";
+                   if(document.getElementById("btnStatusExp")) document.getElementById("btnStatusExp").style.display = "none";
+               } else {
+                   document.getElementById("hrInstructionText").innerHTML = '<i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดและจัดการข้อมูล | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล';
+                   document.getElementById("btnExportExcel").style.display = "inline-block";
+                   document.getElementById("btnEmailHistory").style.display = "inline-block";
+                   document.getElementById("btnSendEmail").style.display = "inline-block"; 
+                   
+                   if(document.getElementById("btnStatusWait")) document.getElementById("btnStatusWait").style.display = "";
+                   if(document.getElementById("btnStatusWaitOut")) document.getElementById("btnStatusWaitOut").style.display = "";
+                   if(document.getElementById("btnStatusExp")) document.getElementById("btnStatusExp").style.display = "";
+               }
+
+               document.getElementById("dateStart").value = "";
+               document.getElementById("dateEnd").value = "";
+               document.getElementById("dateFilterType").value = "0";
+               document.querySelectorAll('.col-filter').forEach(inp => inp.value = "");
+               
+               filterByStatus('ทั้งหมด', document.getElementById('btnStatusAll'));
+               document.getElementById("hrSection").style.display = "block";
+               fetchHRTableData();
+            } else {
+               document.getElementById("insuranceForm").style.display = "block";
+               document.getElementById("tableSection").style.display = "block"; 
+               fetchTableData(result.idCard); 
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }, 1500);
+          
+          document.getElementById("idCard").value = result.idCard;
+          document.getElementById("empId").value = result.empId;
+          document.getElementById("name").value = result.name;
+          document.getElementById("position").value = result.position;
+          document.getElementById("department").value = result.department;
+
+          const setAutoFill = (id, value, allowEdit = false) => {
+              const el = document.getElementById(id);
+              if (el) {
+                  if (value && value !== "") {
+                      el.value = value;
+                      if ((currentUserLevel === 'EMP' || currentUserLevel === '') && allowEdit) {
+                          el.readOnly = false;
+                          el.classList.remove("readonly-field");
+                      } else {
+                          el.readOnly = true;
+                          el.classList.add("readonly-field");
+                      }
+                  } else {
+                      el.value = "";
+                      el.readOnly = false;
+                      el.classList.remove("readonly-field");
+                  }
+              }
+          };
+
+          setAutoFill("dob", result.dob, true); 
+          setAutoFill("tel", result.tel, true); 
+          setAutoFill("address", result.address, true); 
+          setAutoFill("branch", result.branch, false); 
+          setAutoFill("startDate", result.startDate, false);
+
+        } else {
+          Swal.fire({ icon: 'error', title: 'ไม่พบข้อมูล', text: 'ไม่มี ID Card นี้ในระบบ กรุณาตรวจสอบอีกครั้ง', confirmButtonColor: '#4e54c8' });
+        }
+      }).checkLogin(idCardInput);
+    }
+
+    function fetchTableData(idCard) {
+      document.getElementById("tableBody").innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><br><small class="text-muted mt-2 d-block">กำลังโหลดข้อมูลประวัติ...</small></td></tr>';
+      
+      google.script.run.withSuccessHandler(function(data) {
+        currentRecords = data; 
+        var tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+        
+        if(data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">ยังไม่มีประวัติการซื้อประกัน</td></tr>';
+          return;
+        }
+        
+        data.forEach(function(row, index) {
+          /* ปรับการสร้าง Badge ตาม CSS ใหม่ */
+          var statusBadge = '';
+          if (row.status === 'รอแจ้งเข้าประกัน') statusBadge = '<span class="badge bg-info text-dark status-badge rounded-pill"><i class="bi bi-clock-history me-1"></i> ' + row.status + '</span>';
+          else if (row.status === 'แจ้งเข้าแล้ว') statusBadge = '<span class="badge bg-warning text-dark status-badge rounded-pill"><i class="bi bi-hourglass-split me-1"></i> ' + row.status + '</span>';
+          else if (row.status === 'รอแจ้งออก') statusBadge = '<span class="badge bg-danger text-white status-badge rounded-pill"><i class="bi bi-box-arrow-right me-1"></i> ' + row.status + '</span>';
+          else if (row.status === 'แจ้งออกแล้ว') statusBadge = '<span class="badge bg-dark text-white status-badge rounded-pill"><i class="bi bi-check2-circle me-1"></i> ' + row.status + '</span>';
+          else if (row.status === 'หมดอายุประกัน') statusBadge = '<span class="badge bg-secondary text-white status-badge rounded-pill"><i class="bi bi-calendar-x me-1"></i> ' + row.status + '</span>';
+          else statusBadge = '<span class="badge bg-secondary status-badge rounded-pill">' + row.status + '</span>';
+          
+          var slipIcon = '';
+          if (row.slipStatus === 'สลิปโอนเงินถูกต้อง') slipIcon = '<i class="bi bi-check-circle-fill text-success fs-5" title="สลิปถูกต้อง"></i>';
+          else if (row.slipStatus === 'สลิปโอนเงินไม่ถูกต้อง') slipIcon = '<i class="bi bi-x-circle-fill text-danger fs-5" title="สลิปไม่ถูกต้อง"></i>';
+          
+          var docBadge = '<div class="doc-cell-wrapper">';
+          docBadge += (row.checkDoc === 'ข้อมูลครบถ้วน' ? '<span class="badge bg-success doc-badge rounded-pill"><i class="bi bi-check-circle me-1"></i> ' + row.checkDoc + '</span>' : '<span class="badge bg-danger doc-badge rounded-pill"><i class="bi bi-x-circle me-1"></i> ' + row.checkDoc + '</span>');
+          docBadge += '<div>' + slipIcon + '</div></div>';
+          
+          var displayRemainingDays = row.status === 'รอแจ้งเข้าประกัน' ? '-' : row.remainingDays;
+          var remainingDaysClass = displayRemainingDays === 'หมดอายุ' ? 'text-danger' : (displayRemainingDays === '-' ? 'text-dark' : 'text-primary');
+          
+          var tr = document.createElement("tr");
+          tr.style.cursor = "pointer"; 
+          tr.onclick = function() { showDetails(index); };
+
+          tr.innerHTML = `
+            <td>${row.timestamp}</td>
+            <td><span class="text-success">${row.coverageStart}</span></td>
+            <td><span class="text-danger">${row.coverageEnd}</span></td>
+            <td><span class="text-dark">${row.cancelDate || '-'}</span></td>
+            <td><span class="${remainingDaysClass}">${displayRemainingDays}</span></td>
+            <td>${statusBadge}</td>
+            <td class="text-start">${docBadge}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }).getInsuranceRecords(idCard);
+    }
+
+    function filterByStatus(status, btnElement) {
+        currentStatusFilter = status;
+        
+        let btns = [
+            { id: 'btnStatusAll', class: 'btn btn-outline-primary' },
+            { id: 'btnStatusWait', class: 'btn btn-outline-info text-dark' },
+            { id: 'btnStatusIn', class: 'btn btn-outline-warning text-dark' },
+            { id: 'btnStatusWaitOut', class: 'btn btn-outline-danger' },
+            { id: 'btnStatusOut', class: 'btn btn-outline-dark' },
+            { id: 'btnStatusExp', class: 'btn btn-outline-secondary' }
+        ];
+        
+        btns.forEach(b => {
+            let el = document.getElementById(b.id);
+            if (el) el.className = b.class;
+        });
+
+        if (status === 'ทั้งหมด') btnElement.className = 'btn btn-primary active';
+        else if (status === 'รอแจ้งเข้าประกัน') btnElement.className = 'btn btn-info active text-white';
+        else if (status === 'แจ้งเข้าแล้ว') btnElement.className = 'btn btn-warning active text-dark';
+        else if (status === 'รอแจ้งออก') btnElement.className = 'btn btn-danger active text-white';
+        else if (status === 'แจ้งออกแล้ว') btnElement.className = 'btn btn-dark active text-white';
+        else if (status === 'หมดอายุประกัน') btnElement.className = 'btn btn-secondary active text-white';
+
+        if (currentUserLevel === 'HR') {
+            document.getElementById("btnApproveInAll").style.display = (status === 'รอแจ้งเข้าประกัน') ? "inline-block" : "none";
+            document.getElementById("btnApproveOutAll").style.display = (status === 'รอแจ้งออก') ? "inline-block" : "none";
+            
+            // ปิดโหมดเลือกเมื่อสลับแท็บสถานะ
+            let cancelIn = document.getElementById("btnCancelSelectIn");
+            if(cancelIn) cancelIn.style.display = "none";
+            let cancelOut = document.getElementById("btnCancelSelectOut");
+            if(cancelOut) cancelOut.style.display = "none";
+            
+            if (typeof cancelSelectModeIn === 'function') cancelSelectModeIn();
+            if (typeof cancelSelectModeOut === 'function') cancelSelectModeOut();
+        }
+        
+        applyAllFilters();
+    }
+
+    function applyAllFilters() {
+        let tbody = document.getElementById("hrTableBody");
+        let tr = tbody.getElementsByTagName("tr");
+        let dateStart = document.getElementById("dateStart").value; 
+        let dateEnd = document.getElementById("dateEnd").value; 
+        let dateColIndex = parseInt(document.getElementById("dateFilterType").value) || 0;
+        let colFilters = document.querySelectorAll('.col-filter');
+        let visibleCount = 0;
+
+        for (let i = 0; i < tr.length; i++) {
+            if (tr[i].classList.contains("no-data-row")) continue;
+
+            let td = tr[i].getElementsByTagName("td");
+            let showRow = true;
+
+            let rowStatus = tr[i].getAttribute("data-status");
+
+            if (currentStatusFilter !== 'ทั้งหมด' && rowStatus !== currentStatusFilter) {
+                showRow = false;
+            }
+
+            if (showRow && (dateStart || dateEnd)) {
+                let dateText = td[dateColIndex].innerText.trim(); 
+                if (dateText !== "-" && dateText !== "") {
+                    let parts = dateText.split(" ")[0].split("/"); 
+                    if (parts.length === 3) {
+                        let rowDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                        if (dateStart) {
+                            let start = new Date(dateStart);
+                            start.setHours(0,0,0,0);
+                            if (rowDate < start) showRow = false;
+                        }
+                        if (dateEnd) {
+                            let end = new Date(dateEnd);
+                            end.setHours(23,59,59,999);
+                            if (rowDate > end) showRow = false;
+                        }
+                    }
+                } else {
+                    showRow = false;
+                }
+            }
+
+            if (showRow) {
+                for (let c = 0; c < colFilters.length; c++) {
+                    let filterVal = colFilters[c].value.toUpperCase();
+                    if (filterVal) {
+                        let colIdx = colFilters[c].getAttribute("data-col");
+                        if(colIdx !== null) {
+                            let cellText = td[colIdx].textContent || td[colIdx].innerText;
+                            if (cellText.toUpperCase().indexOf(filterVal) === -1) {
+                                showRow = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            tr[i].style.display = showRow ? "" : "none";
+            if(showRow) visibleCount++;
+        }
+        
+        document.getElementById("hrTotalCount").innerText = "รวม " + visibleCount + " รายการ";
+    }
+
+    function toggleSelectAllMain(source) {
+        let rows = document.querySelectorAll("#hrTableBody tr:not(.no-data-row)");
+        rows.forEach(tr => {
+            if (tr.style.display !== 'none') {
+                let cb = tr.querySelector('.main-chk');
+                if(cb) cb.checked = source.checked;
+            }
+        });
+    }
+
+    function fetchHRTableData() {
+      // ยกเลิกโหมดเลือกทุกครั้งที่มีการดึงข้อมูลใหม่
+      if (typeof cancelSelectModeIn === 'function') cancelSelectModeIn();
+      if (typeof cancelSelectModeOut === 'function') cancelSelectModeOut();
+      
+      let selectAllMain = document.getElementById("selectAllMain");
+      if(selectAllMain) selectAllMain.checked = false;
+        
+      var tbody = document.getElementById("hrTableBody");
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><br><small class="text-muted mt-2 d-block">กำลังโหลดข้อมูลทั้งหมด...</small></td></tr>';
+      
+      google.script.run.withSuccessHandler(function(data) {
+        currentRecords = data; 
+        tbody.innerHTML = "";
+        
+        if(data.length === 0) {
+          tbody.innerHTML = '<tr class="no-data-row"><td colspan="9" class="text-center text-muted py-3">ยังไม่มีประวัติการซื้อประกันในระบบ</td></tr>';
+          document.getElementById("hrTotalCount").innerText = "รวม 0 รายการ";
+          return;
+        }
+        
+        data.forEach(function(row, index) {
+          if (currentUserLevel === 'JMI') {
+              if (row.status !== 'แจ้งเข้าแล้ว' && row.status !== 'แจ้งออกแล้ว') return; 
+          }
+
+          /* ปรับการสร้าง Badge ตาม CSS ใหม่ */
+          var statusBadge = '';
+          if (row.status === 'รอแจ้งเข้าประกัน') statusBadge = '<span class="badge bg-info text-dark status-badge rounded-pill"><i class="bi bi-clock-history me-1"></i> ' + row.status + '</span>';
+          else if (row.status === 'แจ้งเข้าแล้ว') statusBadge = '<span class="badge bg-warning text-dark status-badge rounded-pill"><i class="bi bi-hourglass-split me-1"></i> ' + row.status + '</span>';
+          else if (row.status === 'รอแจ้งออก') statusBadge = '<span class="badge bg-danger text-white status-badge rounded-pill"><i class="bi bi-box-arrow-right me-1"></i> ' + row.status + '</span>';
+          else if (row.status === 'แจ้งออกแล้ว') statusBadge = '<span class="badge bg-dark text-white status-badge rounded-pill"><i class="bi bi-check2-circle me-1"></i> ' + row.status + '</span>';
+          else if (row.status === 'หมดอายุประกัน') statusBadge = '<span class="badge bg-secondary text-white status-badge rounded-pill"><i class="bi bi-calendar-x me-1"></i> ' + row.status + '</span>';
+          else statusBadge = '<span class="badge bg-secondary status-badge rounded-pill">' + row.status + '</span>';
+          
+          var slipIcon = '';
+          var hiddenSlipText = '<span style="display:none;">' + (row.slipStatus || "") + '</span>';
+          if (row.slipStatus === 'สลิปโอนเงินถูกต้อง') slipIcon = '<i class="bi bi-check-circle-fill text-success fs-5" title="สลิปถูกต้อง"></i>';
+          else if (row.slipStatus === 'สลิปโอนเงินไม่ถูกต้อง') slipIcon = '<i class="bi bi-x-circle-fill text-danger fs-5" title="สลิปไม่ถูกต้อง"></i>';
+          
+          var docBadge = '<div class="doc-cell-wrapper">';
+          docBadge += (row.checkDoc === 'ข้อมูลครบถ้วน' ? '<span class="badge bg-success doc-badge rounded-pill"><i class="bi bi-check-circle me-1"></i> ' + row.checkDoc + '</span>' : '<span class="badge bg-danger doc-badge rounded-pill"><i class="bi bi-x-circle me-1"></i> ' + row.checkDoc + '</span>');
+          docBadge += '<div>' + slipIcon + hiddenSlipText + '</div></div>';
+          
+          var displayRemainingDays = row.remainingDays;
+          if (row.status === 'รอแจ้งเข้าประกัน') displayRemainingDays = '-';
+          var remainingDaysClass = displayRemainingDays === 'หมดอายุ' ? 'text-danger' : (displayRemainingDays === '-' ? 'text-dark' : 'text-primary');
+          
+          var chkHtml = '';
+          var mainChkHtml = '';
+          if (currentUserLevel === 'HR' || currentUserLevel === 'JMI') {
+              mainChkHtml = `<input type="checkbox" class="form-check-input main-chk" value="${index}" onclick="event.stopPropagation()">`;
+          }
+          if (currentUserLevel === 'HR') {
+              if (row.status === 'รอแจ้งเข้าประกัน' && row.slipStatus === 'สลิปโอนเงินถูกต้อง') {
+                  chkHtml = `<input type="checkbox" class="form-check-input select-in-chk" style="display:none;" value="${row.rowNumber}" onclick="event.stopPropagation()">`;
+              } else if (row.status === 'รอแจ้งออก' && (row.cancelStatus || '') !== '' && (row.cancelDate || '') !== '' && row.cancelDate !== '-') {
+                  chkHtml = `<input type="checkbox" class="form-check-input select-out-chk" style="display:none;" value="${row.rowNumber}" onclick="event.stopPropagation()">`;
+              }
+          }
+
+          var tr = document.createElement("tr");
+          tr.style.cursor = "pointer"; 
+          tr.onclick = function() { showDetails(index); };
+          tr.setAttribute("data-status", row.status); 
+          tr.setAttribute("data-slip-status", row.slipStatus || ""); 
+          tr.setAttribute("data-index", index); 
+
+          tr.innerHTML = `
+            <td>
+                <div class="date-cell-wrapper">
+                    ${mainChkHtml}${chkHtml} <span>${row.timestamp}</span>
+                </div>
+            </td>
+            <td><span class="text-secondary">${row.empId}</span></td>
+            <td class="text-start">${row.name}</td>
+            <td><span class="text-success">${row.coverageStart}</span></td>
+            <td><span class="text-danger">${row.coverageEnd}</span></td>
+            <td><span class="${remainingDaysClass}">${displayRemainingDays}</span></td>
+            <td>${statusBadge}</td>
+            <td><span class="text-dark">${row.cancelDate || '-'}</span></td>
+            <td class="text-start">${docBadge}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        
+        applyAllFilters(); 
+        
+      }).getAllInsuranceRecords();
+    }
+
+    // ========== ระบบเลือก Checkbox หลายรายการเพื่ออนุมัติพร้อมกัน ==========
+
+    let isSelectModeIn = false;
+    function approveAllInsuranceIn() {
+        let eligibleCheckboxes = document.querySelectorAll('.select-in-chk');
+        let visibleEligible = Array.from(eligibleCheckboxes).filter(cb => cb.closest('tr').style.display !== 'none');
+
+        if (visibleEligible.length === 0 && !isSelectModeIn) {
+            Swal.fire({ icon: 'info', title: 'ไม่มีรายการอัปเดต', text: 'ไม่พบรายการ "รอแจ้งเข้าประกัน" ที่ตรวจสอบสลิปโอนเงินแล้วในหน้าตารางปัจจุบัน', timer: 2000, showConfirmButton: false });
+            return;
+        }
+
+        if (!isSelectModeIn) {
+            isSelectModeIn = true;
+            let btn = document.getElementById("btnApproveInAll");
+            btn.classList.replace('btn-info', 'btn-success');
+            btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>ยืนยันแจ้งเข้าที่เลือก';
+
+            let btnCancel = document.getElementById("btnCancelSelectIn");
+            if(btnCancel) btnCancel.style.display = "inline-block";
+
+            let th = document.getElementById("thTimestamp");
+            if(th) th.innerHTML = '<div class="date-cell-wrapper"><input type="checkbox" id="selectAllIn" class="form-check-input" onchange="toggleSelectAllIn(this)"> วันที่บันทึก</div>';
+
+            document.querySelectorAll('.main-chk').forEach(cb => cb.style.display = "none");
+            
+            visibleEligible.forEach(cb => {
+                cb.style.display = "inline-block";
+                cb.checked = false;
+            });
+        } else {
+            let checked = document.querySelectorAll('.select-in-chk:checked');
+            let rowNumbers = Array.from(checked).map(cb => parseInt(cb.value));
+
+            if (rowNumbers.length === 0) {
+                Swal.fire({icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกอย่างน้อย 1 รายการเพื่ออนุมัติ'});
+                return;
+            }
+
+            Swal.fire({
+                title: 'ยืนยันแจ้งเข้าประกัน?',
+                text: `คุณต้องการอนุมัติแจ้งเข้าจำนวน ${rowNumbers.length} รายการใช่หรือไม่?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#17a2b8',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'ยืนยันอนุมัติ',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'กำลังอัปเดตสถานะ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    google.script.run.withSuccessHandler(function(res) {
+                        if(res.success) {
+                            Swal.fire({ icon: 'success', title: 'อัปเดตสำเร็จ', text: 'อนุมัติแจ้งเข้าจำนวน ' + res.count + ' รายการ', timer: 2000, showConfirmButton: false });
+                            cancelSelectModeIn();
+                            fetchHRTableData();
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.error });
+                        }
+                    }).confirmMultipleInsuranceRegistration(rowNumbers);
+                }
+            });
+        }
+    }
+
+    function cancelSelectModeIn() {
+        isSelectModeIn = false;
+        let btn = document.getElementById("btnApproveInAll");
+        if(btn) {
+            btn.classList.replace('btn-success', 'btn-info');
+            btn.innerHTML = '<i class="bi bi-check-all me-1"></i>อนุมัติแจ้งเข้า All';
+        }
+
+        let btnCancel = document.getElementById("btnCancelSelectIn");
+        if(btnCancel) btnCancel.style.display = "none";
+
+        let th = document.getElementById("thTimestamp");
+        if(th) th.innerHTML = '<div class="date-cell-wrapper"><input type="checkbox" id="selectAllMain" class="form-check-input" onchange="toggleSelectAllMain(this)"> วันที่บันทึก</div>';
+
+        document.querySelectorAll('.main-chk').forEach(cb => {
+            cb.style.display = "inline-block";
+            cb.checked = false;
+        });
+        document.querySelectorAll('.select-in-chk').forEach(cb => {
+            cb.style.display = "none";
+            cb.checked = false;
+        });
+    }
+
+    function toggleSelectAllIn(source) {
+        let eligibleCheckboxes = document.querySelectorAll('.select-in-chk');
+        let visibleEligible = Array.from(eligibleCheckboxes).filter(cb => cb.closest('tr').style.display !== 'none');
+        visibleEligible.forEach(cb => cb.checked = source.checked);
+    }
+
+    // --- ส่วนของการแจ้งออก ALL ---
+    
+    let isSelectModeOut = false;
+    function approveAllInsuranceOut() {
+        let eligibleCheckboxes = document.querySelectorAll('.select-out-chk');
+        let visibleEligible = Array.from(eligibleCheckboxes).filter(cb => cb.closest('tr').style.display !== 'none');
+
+        if (visibleEligible.length === 0 && !isSelectModeOut) {
+            Swal.fire({ icon: 'info', title: 'ไม่มีรายการอัปเดต', text: 'ไม่พบรายการ "รอแจ้งออก" ที่ระบุข้อมูลการแจ้งออกครบถ้วนในหน้าตารางปัจจุบัน', timer: 3000, showConfirmButton: false });
+            return;
+        }
+
+        if (!isSelectModeOut) {
+            isSelectModeOut = true;
+            let btn = document.getElementById("btnApproveOutAll");
+            btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>ยืนยันแจ้งออกที่เลือก';
+
+            let btnCancel = document.getElementById("btnCancelSelectOut");
+            if(btnCancel) btnCancel.style.display = "inline-block";
+
+            let th = document.getElementById("thTimestamp");
+            if(th) th.innerHTML = '<div class="date-cell-wrapper"><input type="checkbox" id="selectAllOut" class="form-check-input" onchange="toggleSelectAllOut(this)"> วันที่บันทึก</div>';
+
+            document.querySelectorAll('.main-chk').forEach(cb => cb.style.display = "none");
+            
+            visibleEligible.forEach(cb => {
+                cb.style.display = "inline-block";
+                cb.checked = false;
+            });
+        } else {
+            let checked = document.querySelectorAll('.select-out-chk:checked');
+            let rowNumbers = Array.from(checked).map(cb => parseInt(cb.value));
+
+            if (rowNumbers.length === 0) {
+                Swal.fire({icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกอย่างน้อย 1 รายการเพื่ออนุมัติ'});
+                return;
+            }
+
+            Swal.fire({
+                title: 'ยืนยันแจ้งออกประกัน?',
+                text: `คุณต้องการอนุมัติแจ้งออกจำนวน ${rowNumbers.length} รายการใช่หรือไม่?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'ยืนยันอนุมัติ',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'กำลังอัปเดตสถานะ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    google.script.run.withSuccessHandler(function(res) {
+                        if(res.success) {
+                            Swal.fire({ icon: 'success', title: 'อัปเดตสำเร็จ', text: 'อนุมัติแจ้งออกจำนวน ' + res.count + ' รายการ', timer: 2000, showConfirmButton: false });
+                            cancelSelectModeOut();
+                            fetchHRTableData();
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.error });
+                        }
+                    }).confirmMultipleCancelRegistration(rowNumbers);
+                }
+            });
+        }
+    }
+
+    function cancelSelectModeOut() {
+        isSelectModeOut = false;
+        let btn = document.getElementById("btnApproveOutAll");
+        if(btn) {
+            btn.innerHTML = '<i class="bi bi-check-all me-1"></i>อนุมัติแจ้งออก All';
+        }
+
+        let btnCancel = document.getElementById("btnCancelSelectOut");
+        if(btnCancel) btnCancel.style.display = "none";
+
+        let th = document.getElementById("thTimestamp");
+        if(th) th.innerHTML = '<div class="date-cell-wrapper"><input type="checkbox" id="selectAllMain" class="form-check-input" onchange="toggleSelectAllMain(this)"> วันที่บันทึก</div>';
+
+        document.querySelectorAll('.main-chk').forEach(cb => {
+            cb.style.display = "inline-block";
+            cb.checked = false;
+        });
+        document.querySelectorAll('.select-out-chk').forEach(cb => {
+            cb.style.display = "none";
+            cb.checked = false;
+        });
+    }
+
+    function toggleSelectAllOut(source) {
+        let eligibleCheckboxes = document.querySelectorAll('.select-out-chk');
+        let visibleEligible = Array.from(eligibleCheckboxes).filter(cb => cb.closest('tr').style.display !== 'none');
+        visibleEligible.forEach(cb => cb.checked = source.checked);
+    }
+    // =========================================================================
+
+    function toggleEmailView(mode) {
+        var formArea = document.getElementById("emailFormArea");
+        var sidebar = document.getElementById("autoSettingsSidebar");
+        if (mode === 'manual') {
+            formArea.className = "col-lg-12 p-0 d-flex flex-column";
+            sidebar.style.display = "none";
+        } else {
+            formArea.className = "col-lg-8 p-0 border-end border-2 border-white d-flex flex-column";
+            sidebar.style.display = "flex";
+        }
+    }
+
+    function openEmailHistoryModal() {
+        var tbody = document.getElementById("emailHistoryBody");
+        tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-muted"><div class="spinner-border spinner-border-sm text-info me-2" role="status"></div>กำลังโหลดข้อมูลประวัติ...</td></tr>';
+        
+        var modalEl = document.getElementById('emailHistoryModal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) {
+            modal = new bootstrap.Modal(modalEl);
+        }
+        modal.show();
+        
+        google.script.run.withSuccessHandler(function(data) {
+            tbody.innerHTML = "";
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">ยังไม่มีประวัติการส่งอีเมล</td></tr>';
+                return;
+            }
+            
+            data.forEach(function(row) {
+                var statusClass = row.status.indexOf("สำเร็จ") !== -1 ? "text-success" : "text-danger";
+                var typeClass = row.type.indexOf("อัตโนมัติ") !== -1 ? "badge bg-secondary" : "badge bg-primary";
+                var fileBtn = (row.fileUrl && row.fileUrl !== "-" && row.fileUrl.indexOf("http") !== -1) 
+                    ? `<button type="button" onclick="viewDocument('${row.fileUrl}')" class="btn btn-sm btn-outline-success py-0 px-2" title="เปิดไฟล์ Excel"><i class="bi bi-file-earmark-excel"></i> เปิดไฟล์</button>` 
+                    : `<span class="text-muted small">-</span>`;
+
+                var tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${row.timestamp}</td>
+                    <td><span class="${typeClass}">${row.type}</span></td>
+                    <td class="text-start" style="word-break: break-all;"><small>${row.recipients}</small></td>
+                    <td class="text-start">${row.subject}</td>
+                    <td><span class="badge border border-dark text-dark">${row.filter}</span></td>
+                    <td><strong class="${statusClass}">${row.status}</strong></td>
+                    <td>${fileBtn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }).getEmailHistory();
+    }
+
+    function updateFreqOptions() {
+        var type = document.getElementById("autoFreqType").value;
+        var valContainer = document.getElementById("autoFreqValueContainer");
+        valContainer.innerHTML = "";
+        
+        if(type === "DAILY") {
+            valContainer.style.display = "none";
+        } else if(type === "WEEKLY") {
+            valContainer.style.display = "block";
+            var days = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+            var html = '<div class="d-flex flex-wrap gap-2 mt-2">';
+            days.forEach((d,i) => {
+                html += `<div class="form-check form-check-inline m-0"><input class="form-check-input freq-cb" type="checkbox" value="${i}" id="day${i}"><label class="form-check-label small" for="day${i}">${d}</label></div>`;
+            });
+            html += '</div>';
+            valContainer.innerHTML = html;
+        } else if(type === "MONTHLY") {
+            valContainer.style.display = "block";
+            var html = '<div class="d-flex flex-wrap gap-2 mt-2" style="max-height: 120px; overflow-y: auto; border: 1px solid #ced4da; padding: 10px; border-radius: 5px; background: white;">';
+            for(let i=1; i<=31; i++) {
+                html += `<div class="form-check form-check-inline m-0" style="width: 45px;"><input class="form-check-input freq-cb" type="checkbox" value="${i}" id="date${i}"><label class="form-check-label small" for="date${i}">${i}</label></div>`;
+            }
+            html += '</div>';
+            valContainer.innerHTML = html;
+        }
+    }
+
+    function resetAutoForm() {
+        document.getElementById("editAutoSetId").value = "";
+        document.getElementById("autoFormTitle").innerHTML = '<i class="bi bi-plus-circle"></i> สร้างการตั้งค่าใหม่';
+        document.getElementById("btnCancelEdit").classList.add('d-none');
+        document.getElementById("btnSaveAutoSet").innerHTML = '<i class="bi bi-save me-1"></i> บันทึกและเปิดใช้งานเซ็ตนี้';
+        
+        document.getElementById("autoSetName").value = "";
+        document.getElementById("autoEmailSubject").value = "รายงานข้อมูลประกันระบบ JMI";
+        document.getElementById("autoEmailBody").value = "";
+        
+        document.querySelectorAll('.status-cb-auto').forEach(cb => cb.checked = false);
+        document.getElementById("autoConditionType").value = "STATUS";
+        document.getElementById("autoDaysLimit").value = "";
+
+        document.getElementById("autoFreqType").value = "DAILY";
+        updateFreqOptions();
+        document.getElementById("autoTime").value = "11:00";
+
+        document.getElementById("autoEmailRecipientsContainer").innerHTML = `
+            <div class="input-group mb-2 email-row">
+                <input type="email" class="form-control auto-email-input" placeholder="example@gmail.com">
+            </div>
+        `;
+        document.querySelectorAll('.col-cb-auto').forEach(cb => cb.checked = true);
+    }
+
+    function renderAutoSettingsList() {
+        let container = document.getElementById("savedAutoSetsContainer");
+        document.getElementById("autoSetCountBadge").innerText = autoSettingsList.length + " เซ็ต";
+        
+        if (autoSettingsList.length > 0) {
+            document.getElementById("btnDisableAll").classList.remove('d-none');
+        } else {
+            document.getElementById("btnDisableAll").classList.add('d-none');
+        }
+
+        if (autoSettingsList.length === 0) {
+            container.innerHTML = `<div class="text-center text-muted my-5"><i class="bi bi-robot fs-1"></i><p class="mt-2">ยังไม่มีการตั้งค่าอัตโนมัติ</p></div>`;
+            return;
+        }
+
+        let html = '';
+        autoSettingsList.forEach((set, index) => {
+            let activeClass = set.isActive ? "text-success" : "text-secondary";
+            let activeText = set.isActive ? "เปิดใช้งานอยู่" : "ปิดใช้งาน";
+            
+            let statusBadges = (set.statusFilter || []).map(s => `<span class="badge bg-light text-dark border me-1">${s}</span>`).join('');
+            if(!statusBadges) statusBadges = `<span class="badge bg-light text-muted border">ไม่ได้เลือกสถานะ</span>`;
+
+            let freqStr = set.freqType === 'DAILY' ? 'ทุกวัน' : (set.freqType === 'WEEKLY' ? 'รายสัปดาห์' : 'รายเดือน');
+            
+            let dispTime = set.timeHour || "11:00";
+            if(!dispTime.includes(":")) dispTime = dispTime.padStart(2, '0') + ":00";
+            
+            html += `
+                <div class="auto-set-card ${set.isActive ? 'border-primary' : ''}">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="fw-bold m-0 text-primary text-truncate pe-2">${set.setName || 'ไม่มีชื่อเซ็ต'}</h6>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="toggle_${index}" ${set.isActive ? 'checked' : ''} onchange="toggleAutoSetting(${index}, this.checked)">
+                        </div>
+                    </div>
+                    <div class="small mb-2">${statusBadges}</div>
+                    <div class="d-flex justify-content-between align-items-end">
+                        <div>
+                            <span class="d-block small text-muted"><i class="bi bi-clock"></i> ${freqStr} เวลา ${dispTime} น.</span>
+                            <span class="d-block small fw-bold ${activeClass}">${activeText}</span>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="editAutoSetting(${index})" title="แก้ไข"><i class="bi bi-pencil"></i></button>
+                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="deleteAutoSetting(${index})" title="ลบ"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function openEmailModal() {
+        let tbody = document.getElementById("hrTableBody");
+        let rows = tbody.querySelectorAll("tr:not(.no-data-row)");
+        let visibleCount = 0;
+        rows.forEach(tr => { if (tr.style.display !== 'none') visibleCount++; });
+
+        if(visibleCount === 0) {
+            Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'ไม่มีข้อมูลสำหรับส่งอีเมล กรุณากรองข้อมูลก่อนเปิดหน้าต่างนี้ (สำหรับการส่ง Manual)' });
+        }
+
+        let defaultSubj = "รายงานข้อมูลประกันระบบ JMI - สถานะ: " + currentStatusFilter;
+        
+        document.getElementById("manualEmailSubject").value = defaultSubj;
+        document.getElementById("manualEmailBody").value = "";
+        document.getElementById("manualEmailRecipientsContainer").innerHTML = `
+            <div class="input-group mb-2 email-row">
+                <input type="email" class="form-control manual-email-input" placeholder="example@gmail.com">
+            </div>
+        `;
+        document.querySelectorAll('.col-cb-manual').forEach(cb => cb.checked = true);
+        
+        document.getElementById("savedAutoSetsContainer").innerHTML = `<div class="text-center text-muted my-5"><div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div><br><small>กำลังโหลดข้อมูล...</small></div>`;
+        
+        toggleEmailView('manual');
+        var triggerEl = document.querySelector('#manual-tab');
+        var tab = new bootstrap.Tab(triggerEl);
+        tab.show();
+
+        google.script.run.withSuccessHandler(function(settingsArray) {
+            autoSettingsList = settingsArray || [];
+            renderAutoSettingsList();
+            resetAutoForm(); 
+
+            var modalEl = document.getElementById('emailModal');
+            var emailModal = bootstrap.Modal.getInstance(modalEl);
+            if (!emailModal) { emailModal = new bootstrap.Modal(modalEl); }
+            emailModal.show();
+        }).getAutoEmailSettingsList();
+    }
+    
+    function editAutoSetting(index) {
+        let set = autoSettingsList[index];
+        if(!set) return;
+
+        var triggerEl = document.querySelector('#emailTab button[data-bs-target="#auto-pane"]');
+        var tab = new bootstrap.Tab(triggerEl);
+        tab.show();
+        toggleEmailView('auto');
+
+        document.getElementById("editAutoSetId").value = set.id || "";
+        document.getElementById("autoFormTitle").innerHTML = '<i class="bi bi-pencil-square"></i> แก้ไขการตั้งค่า';
+        document.getElementById("btnCancelEdit").classList.remove('d-none');
+        document.getElementById("btnSaveAutoSet").innerHTML = '<i class="bi bi-save me-1"></i> บันทึกการแก้ไข';
+
+        document.getElementById("autoSetName").value = set.setName || "";
+        document.getElementById("autoEmailSubject").value = set.subject || "";
+        document.getElementById("autoEmailBody").value = set.bodyMessage || "";
+
+        let savedStatuses = set.statusFilter || [];
+        document.querySelectorAll('.status-cb-auto').forEach(cb => {
+            cb.checked = savedStatuses.includes(cb.value);
+        });
+
+        document.getElementById("autoConditionType").value = set.conditionType || "STATUS";
+        document.getElementById("autoDaysLimit").value = set.daysLimit || "";
+
+        document.getElementById("autoFreqType").value = set.freqType || "DAILY";
+        updateFreqOptions();
+        
+        let savedFreqValues = [];
+        try { savedFreqValues = JSON.parse(set.freqValue || "[]"); } catch(e) { savedFreqValues = [set.freqValue]; }
+        document.querySelectorAll('.freq-cb').forEach(cb => {
+            cb.checked = savedFreqValues.includes(cb.value);
+        });
+
+        let savedTime = set.timeHour || "11:00";
+        if(!savedTime.includes(":")) savedTime = savedTime.padStart(2, '0') + ":00";
+        document.getElementById("autoTime").value = savedTime;
+
+        let savedAutoCols = set.selectedColumns || AVAILABLE_COLUMNS.map(c => c.id);
+        document.querySelectorAll('.col-cb-auto').forEach(cb => {
+            cb.checked = savedAutoCols.includes(cb.value);
+        });
+
+        let container = document.getElementById("autoEmailRecipientsContainer");
+        container.innerHTML = "";
+        let recs = set.recipients ? set.recipients.split(",") : [""];
+        recs.forEach((r, idx) => {
+            let btnDel = idx === 0 ? '' : `<button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()" title="ลบช่องนี้"><i class="bi bi-trash"></i></button>`;
+            container.innerHTML += `
+                <div class="input-group mb-2 email-row">
+                    <input type="email" class="form-control auto-email-input" value="${r.trim()}" placeholder="example@gmail.com">
+                    ${btnDel}
+                </div>
+            `;
+        });
+    }
+
+    function toggleAutoSetting(index, isActive) {
+        let tempSettingsList = JSON.parse(JSON.stringify(autoSettingsList));
+        tempSettingsList[index].isActive = isActive;
+
+        google.script.run
+        .withSuccessHandler(function(res) {
+            autoSettingsList = tempSettingsList; 
+            if (res === 'trigger_error') {
+                Swal.fire({ icon: 'info', title: 'เปลี่ยนสถานะสำเร็จ', text: 'แต่ระบบสร้างเวลาอัตโนมัติอาจไม่ทำงาน กรุณากด "เรียกใช้" ฟังก์ชัน authorizeEmailScope ในหน้าโค้ด 1 ครั้งเพื่อยืนยันสิทธิ์', confirmButtonColor: '#11998e' });
+            } else if (res !== 'success') {
+                Swal.fire({ icon: 'warning', title: 'เปลี่ยนสถานะแล้วแต่การทำงานอาจมีปัญหา', text: res });
+            }
+            renderAutoSettingsList();
+        })
+        .saveAutoEmailSettingsList(JSON.stringify(tempSettingsList), tempSettingsList[index].id);
+    }
+
+    function deleteAutoSetting(index) {
+        Swal.fire({
+            title: 'ยืนยันการลบ?',
+            text: "เซ็ตการตั้งค่านี้จะถูกลบและหยุดทำงานทันที",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'ลบเซ็ตนี้',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                let tempSettingsList = JSON.parse(JSON.stringify(autoSettingsList));
+                let deletedId = tempSettingsList[index].id;
+                tempSettingsList.splice(index, 1);
+
+                google.script.run
+                .withSuccessHandler(function(res) {
+                    autoSettingsList = tempSettingsList;
+                    renderAutoSettingsList();
+                    if(document.getElementById("editAutoSetId").value !== "") {
+                        resetAutoForm(); 
+                    }
+                    if (res === 'success' || res === 'trigger_error') {
+                        Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1000, showConfirmButton: false });
+                    } else {
+                        Swal.fire({ icon: 'warning', title: 'ลบสำเร็จแต่การอัปเดตระบบมีปัญหา', text: res });
+                    }
+                })
+                .saveAutoEmailSettingsList(JSON.stringify(tempSettingsList), deletedId);
+            }
+        });
+    }
+
+    function disableAutoEmail() {
+        if(autoSettingsList.length === 0) return;
+        
+        Swal.fire({
+            title: 'ยืนยันการปิดใช้งาน?',
+            text: "ระบบจะเปลี่ยนสถานะการตั้งค่าทั้งหมดเป็น 'ปิดใช้งาน'",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'ปิดใช้งานทั้งหมด',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                
+                let tempSettingsList = JSON.parse(JSON.stringify(autoSettingsList));
+                tempSettingsList.forEach(s => s.isActive = false);
+
+                google.script.run
+                .withSuccessHandler(function(res) {
+                    autoSettingsList = tempSettingsList;
+                    renderAutoSettingsList();
+                    if (res === 'success' || res === 'trigger_error') {
+                        Swal.fire({ icon: 'success', title: 'ปิดใช้งานทั้งหมดสำเร็จ', timer: 1500, showConfirmButton: false });
+                    } else {
+                        Swal.fire({ icon: 'warning', title: 'เปลี่ยนสถานะแล้วแต่การทำงานอาจมีปัญหา', text: res });
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.message });
+                })
+                .saveAutoEmailSettingsList(JSON.stringify(tempSettingsList), null);
+            }
+        });
+    }
+
+    function addEmailField(type) {
+        var containerId = type === 'manual' ? "manualEmailRecipientsContainer" : "autoEmailRecipientsContainer";
+        var inputClass = type === 'manual' ? "manual-email-input" : "auto-email-input";
+        var container = document.getElementById(containerId);
+        
+        var div = document.createElement("div");
+        div.className = "input-group mb-2 email-row";
+        div.innerHTML = `
+            <input type="email" class="form-control ${inputClass}" placeholder="example@gmail.com">
+            <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()" title="ลบช่องนี้"><i class="bi bi-trash"></i></button>
+        `;
+        container.appendChild(div);
+    }
+
+    function getEmailDataPayload(limit, selectedCols) {
+        let tbody = document.getElementById("hrTableBody");
+        let rows = tbody.querySelectorAll("tr:not(.no-data-row)");
+        let visibleRecords = [];
+
+        let anyChecked = false;
+        rows.forEach(tr => {
+            if (tr.style.display !== 'none') {
+                let mainChk = tr.querySelector('.main-chk');
+                if (mainChk && mainChk.checked) {
+                    anyChecked = true;
+                }
+            }
+        });
+
+        rows.forEach(tr => {
+            if (tr.style.display !== 'none') {
+                let mainChk = tr.querySelector('.main-chk');
+                let isRowSelected = anyChecked ? (mainChk && mainChk.checked) : true;
+                
+                if (isRowSelected) {
+                    let idx = tr.getAttribute("data-index");
+                    if (idx !== null) {
+                        let rowData = currentRecords[idx];
+                        let passLimit = true;
+                        if (limit !== null && !isNaN(limit)) {
+                            let remainStr = rowData.remainingDays.toString().replace(' วัน', '').trim();
+                            if (remainStr === 'หมดอายุ') {
+                                passLimit = true;
+                            } else if (remainStr === '-') {
+                                passLimit = false;
+                            } else {
+                                let remainVal = parseInt(remainStr);
+                                if (remainVal > limit) passLimit = false; 
+                            }
+                        }
+                        if (passLimit) visibleRecords.push(rowData);
+                    }
+                }
+            }
+        });
+        
+        if(visibleRecords.length === 0) return null;
+
+        let tableHtml = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head><meta charset="UTF-8"></head>
+            <body>
+                <table border="1" style="border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #4e54c8; color: #ffffff; font-weight: bold;">
+        `;
+        
+        selectedCols.forEach(colId => {
+            let colDef = AVAILABLE_COLUMNS.find(c => c.id === colId);
+            if(colDef) {
+                tableHtml += `<th>${colDef.label}</th>`;
+            }
+        });
+        
+        tableHtml += `</tr></thead><tbody>`;
+
+        visibleRecords.forEach(row => {
+            let r_req = row.reqFormUrl ? row.reqFormUrl : '-';
+            let r_slip1 = '-'; let r_slip2 = '-';
+            if (row.slipUrl) {
+                let slips = row.slipUrl.split(',');
+                if(slips[0] && slips[0].trim() !== "") r_slip1 = slips[0].trim();
+                if(slips.length > 1 && slips[1].trim() !== "") r_slip2 = slips[1].trim();
+            }
+            let r_id = row.idCopyUrl ? row.idCopyUrl : '-';
+            let r_bb = row.bankBookUrl ? row.bankBookUrl : '-';
+            let r_other = row.otherDocUrl ? row.otherDocUrl : '-';
+
+            tableHtml += `<tr>`;
+            selectedCols.forEach(colId => {
+                let val = '-'; let style = '';
+                if(colId === 'idCard') { val = row.idCard; style = ` style="mso-number-format:'\\@'; border: 1px solid #000;"`; }
+                else if(colId === 'empId') { val = row.empId; style = ` style="mso-number-format:'\\@'; border: 1px solid #000;"`; }
+                else if(colId === 'name') { val = row.name; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'position') { val = row.position; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'company') { val = row.company; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'empStatus') { val = row.empStatus; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'dob') { val = row.dob; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'tel') { val = row.tel; style = ` style="mso-number-format:'\\@'; border: 1px solid #000;"`; }
+                else if(colId === 'address') { val = row.address; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'branch') { val = row.branch; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'insuranceType') { val = row.insuranceType; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'coverageStart') { val = row.coverageStart; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'coverageEnd') { val = row.coverageEnd; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'cancelDate') { val = row.cancelDate || '-'; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'reqFormUrl') { val = r_req; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'slip1') { val = r_slip1; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'slip2') { val = r_slip2; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'idCopyUrl') { val = r_id; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'bankBookUrl') { val = r_bb; style = ` style="border: 1px solid #000;"`; }
+                else if(colId === 'otherDocUrl') { val = r_other; style = ` style="border: 1px solid #000;"`; }
+
+                tableHtml += `<td${style}>${val}</td>`;
+            });
+            tableHtml += `</tr>`;
+        });
+        
+        tableHtml += `</tbody></table></body></html>`;
+        return { html: tableHtml, records: visibleRecords };
+    }
+
+    function previewExcel() {
+        let manualColCbs = document.querySelectorAll('.col-cb-manual:checked');
+        let manualCols = Array.from(manualColCbs).map(cb => cb.value);
+
+        if(manualCols.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกหัวข้อข้อมูลอย่างน้อย 1 หัวข้อ' });
+            return;
+        }
+
+        let payload = getEmailDataPayload(null, manualCols); 
+        if(!payload) {
+            Swal.fire({ icon: 'info', title: 'ไม่มีข้อมูล', text: 'ไม่พบข้อมูลที่จะส่งตามเงื่อนไขที่เลือก (หากต้องการส่งเฉพาะคน โปรดติ๊กเลือกในตารางด้านหลังก่อนครับ)' });
+            return;
+        }
+
+        let match = payload.html.match(/<table border="1" style="border-collapse: collapse;">([\s\S]*?)<\/table>/i);
+        if(match) {
+            let tableHtml = '<table class="table table-bordered table-striped table-hover align-middle text-center mb-0" style="font-size: 0.9rem; white-space: nowrap;">' + match[1] + '</table>';
+            document.getElementById("previewExcelBody").innerHTML = '<div class="table-responsive">' + tableHtml + '</div>';
+            
+            var modalEl = document.getElementById('previewExcelModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (!modal) {
+                modal = new bootstrap.Modal(modalEl);
+            }
+            modal.show();
+        } else {
+             Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดตัวอย่างข้อมูลได้' });
+        }
+    }
+
+    function sendManualEmail() {
+        let inputs = document.querySelectorAll(".manual-email-input");
+        let emails = [];
+        inputs.forEach(inp => { let val = inp.value.trim(); if(val) emails.push(val); });
+        
+        let recipient = emails.join(",");
+        let subject = document.getElementById("manualEmailSubject").value.trim();
+        let bodyMessage = document.getElementById("manualEmailBody").value.trim();
+
+        if(emails.length === 0 || !subject) {
+            Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาระบุอีเมลผู้รับอย่างน้อย 1 คนและหัวเรื่องให้ครบถ้วน' });
+            return;
+        }
+        
+        let manualColCbs = document.querySelectorAll('.col-cb-manual:checked');
+        let manualCols = Array.from(manualColCbs).map(cb => cb.value);
+
+        if(manualCols.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกหัวข้อข้อมูลอย่างน้อย 1 หัวข้อ' });
+            return;
+        }
+
+        let payload = getEmailDataPayload(null, manualCols); 
+        if(!payload) {
+            Swal.fire({ icon: 'info', title: 'ไม่มีข้อมูล', text: 'ไม่พบข้อมูลที่จะส่งตามเงื่อนไขที่เลือก (หากต้องการส่งเฉพาะคน โปรดติ๊กเลือกในตารางด้านหลังก่อนครับ)' });
+            return;
+        }
+
+        Swal.fire({ title: 'กำลังส่งอีเมล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+        google.script.run
+        .withSuccessHandler(function(res) {
+            if(res === 'success') {
+                Swal.fire({ icon: 'success', title: 'ส่งอีเมลสำเร็จ', timer: 1500, showConfirmButton: false });
+                var modalEl = document.getElementById('emailModal');
+                var modal = bootstrap.Modal.getInstance(modalEl);
+                if(modal) modal.hide();
+                
+                let selectAllMain = document.getElementById("selectAllMain");
+                if(selectAllMain) {
+                    selectAllMain.checked = false;
+                    toggleSelectAllMain(selectAllMain);
+                }
+                
+            } else {
+                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res });
+            }
+        })
+        .withFailureHandler(function(err) {
+            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ', text: err.message });
+        })
+        .sendEmailWithExcelBackend(recipient, subject, payload.html, currentStatusFilter, payload.records, bodyMessage);
+    }
+    
+    function saveAutoSetting() {
+        let setName = document.getElementById("autoSetName").value.trim();
+        if(!setName) {
+            Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาตั้งชื่อเซ็ต (ช่วยจำ)' });
+            return;
+        }
+
+        let inputs = document.querySelectorAll(".auto-email-input");
+        let emails = [];
+        inputs.forEach(inp => { let val = inp.value.trim(); if(val) emails.push(val); });
+        
+        let subject = document.getElementById("autoEmailSubject").value.trim();
+        if(emails.length === 0 || !subject) {
+            Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาระบุอีเมลผู้รับและหัวเรื่องให้ครบถ้วน' });
+            return;
+        }
+        
+        let statusCbs = document.querySelectorAll('.status-cb-auto:checked');
+        let statusArr = Array.from(statusCbs).map(cb => cb.value);
+        if(statusArr.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกสถานะที่ต้องการกรองอย่างน้อย 1 สถานะ' });
+            return;
+        }
+
+        let freqCbs = document.querySelectorAll('.freq-cb:checked');
+        let freqValuesArr = Array.from(freqCbs).map(cb => cb.value);
+        if(document.getElementById("autoFreqType").value !== "DAILY" && freqValuesArr.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกวันที่ต้องการส่งอย่างน้อย 1 วัน' });
+            return;
+        }
+
+        let autoColCbs = document.querySelectorAll('.col-cb-auto:checked');
+        let autoCols = Array.from(autoColCbs).map(cb => cb.value);
+        if(autoCols.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกหัวข้อข้อมูลอย่างน้อย 1 หัวข้อ' });
+            return;
+        }
+        
+        let limitVal = document.getElementById("autoDaysLimit").value.trim();
+        let editId = document.getElementById("editAutoSetId").value;
+        let newSetId = editId ? editId : Date.now().toString();
+        
+        let newSet = {
+            id: newSetId,
+            setName: setName,
+            isActive: true,
+            recipients: emails.join(","),
+            subject: subject,
+            statusFilter: statusArr,
+            conditionType: document.getElementById("autoConditionType").value,
+            freqType: document.getElementById("autoFreqType").value,
+            freqValue: JSON.stringify(freqValuesArr),
+            timeHour: document.getElementById("autoTime").value,
+            daysLimit: limitVal,
+            bodyMessage: document.getElementById("autoEmailBody").value.trim(),
+            selectedColumns: autoCols
+        };
+
+        Swal.fire({ title: 'กำลังบันทึกการตั้งค่า...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+        let tempSettingsList = JSON.parse(JSON.stringify(autoSettingsList));
+        
+        if (editId) {
+            let idx = tempSettingsList.findIndex(s => s.id === editId);
+            if(idx !== -1) tempSettingsList[idx] = newSet;
+        } else {
+            tempSettingsList.push(newSet);
+        }
+
+        google.script.run
+        .withSuccessHandler(function(resAuto) {
+            autoSettingsList = tempSettingsList; 
+            
+            if (resAuto === 'success') {
+                Swal.fire({ icon: 'success', title: 'บันทึกและเปิดใช้งานเซ็ตสำเร็จ', timer: 1500, showConfirmButton: false });
+            } else if (resAuto === 'trigger_error') {
+                Swal.fire({ 
+                    icon: 'success', 
+                    title: 'บันทึกข้อมูลสำเร็จ', 
+                    text: 'ระบบบันทึกข้อมูลแล้ว แต่การตั้งเวลาอัตโนมัติ (Trigger) อาจไม่ทำงาน กรุณาไปที่หน้าโค้ด (Code.gs) แล้วกดปุ่ม "เรียกใช้" ฟังก์ชัน authorizeEmailScope 1 ครั้งเพื่อยืนยันสิทธิ์ครับ', 
+                    confirmButtonColor: '#11998e' 
+                });
+            } else {
+                Swal.fire({ icon: 'warning', title: 'บันทึกแล้วแต่ระบบตั้งเวลาอัตโนมัติอาจมีปัญหา', text: 'ERROR: ' + resAuto });
+            }
+            
+            renderAutoSettingsList();
+            resetAutoForm();
+        })
+        .withFailureHandler(function(err) {
+            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ', text: err.message });
+        })
+        .saveAutoEmailSettingsList(JSON.stringify(tempSettingsList), newSetId);
+    }
+
+    function autoCalcEditCovEnd(startDateStr) {
+        if(!startDateStr) return;
+        var start = new Date(startDateStr);
+        if(!isNaN(start.getTime())) {
+            start.setDate(start.getDate() + 364);
+            var m = ('0' + (start.getMonth()+1)).slice(-2);
+            var d = ('0' + start.getDate()).slice(-2);
+            var y = start.getFullYear();
+            document.getElementById("editCovEnd").value = y + '-' + m + '-' + d;
+        }
+    }
+
+    function toggleEditCancelDate() {
+        var status = document.getElementById("editCancelStatus").value;
+        var dateDiv = document.getElementById("editCancelDateDiv");
+        if (status !== "") {
+            dateDiv.style.display = "block";
+        } else {
+            dateDiv.style.display = "none";
+            document.getElementById("editCancelDate").value = "";
+        }
+    }
+
+    function showDetails(index) {
+      var record = currentRecords[index];
+      var modalBody = document.getElementById("detailModalBody");
+      var modalFooter = document.getElementById("detailModalFooter");
+      
+      var isWaitStatus = (record.status === 'รอแจ้งเข้าประกัน');
+      
+      var getSlipLinks = function(url, rowNum, status, slipStatus) {
+          let urls = url ? url.toString().split(',').filter(u => u.trim() !== "") : [];
+          let htmlStr = '<div class="d-inline-block align-top me-2"><div>';
+          
+          for(let i=0; i<urls.length; i++) {
+              htmlStr += '<button type="button" onclick="viewDocument(\'' + urls[i].trim() + '\')" class="btn btn-sm btn-outline-primary mb-2 me-1"><i class="bi bi-file-earmark-image me-1"></i>สลิปโอนเงิน ' + (urls.length > 1 ? i+1 : '') + '</button>';
+          }
+          
+          if (urls.length > 0 && slipStatus === 'สลิปโอนเงินไม่ถูกต้อง') {
+              htmlStr += '<button type="button" class="btn btn-sm btn-danger mb-2 me-1" onclick="deleteSlipUser(' + rowNum + ')" title="ลบสลิปเดิมเพื่อแนบใหม่"><i class="bi bi-trash"></i> ลบ</button>';
+          }
+
+          if (urls.length < 2 && (isWaitStatus || slipStatus === 'สลิปโอนเงินไม่ถูกต้อง')) {
+              htmlStr += '<button type="button" class="btn btn-sm btn-secondary mb-2 me-1" onclick="triggerMissingSlipUpload(' + rowNum + ')" title="คลิกเพื่อแนบสลิปเพิ่มเติม"><i class="bi bi-plus-circle me-1"></i>เพิ่มสลิป</button>';
+          }
+          if (urls.length === 0) {
+               htmlStr += '<span class="badge bg-secondary mb-2 me-1 py-2 px-3 fw-normal">ไม่มีสลิปโอนเงิน</span>';
+          }
+          htmlStr += '</div>';
+          
+          if (slipStatus === 'สลิปโอนเงินถูกต้อง') {
+              htmlStr += '<div class="text-center mt-n1"><span class="badge bg-success mb-2 py-1 px-2 fw-normal"><i class="bi bi-check-circle me-1"></i>สลิปถูกต้อง</span></div>';
+          } else if (slipStatus === 'สลิปโอนเงินไม่ถูกต้อง') {
+              htmlStr += '<div class="text-center mt-n1"><span class="badge bg-danger mb-2 py-1 px-2 fw-normal"><i class="bi bi-x-circle me-1"></i>สลิปไม่ถูกต้อง</span></div>';
+          }
+          
+          htmlStr += '</div>';
+          return htmlStr;
+      };
+      
+      var getFileLink = function(url, label, rowNum) {
+          if(url && url.toString().trim() !== "") {
+              return '<button type="button" onclick="viewDocument(\'' + url.trim() + '\')" class="btn btn-sm btn-outline-primary mb-2 me-2 align-top"><i class="bi bi-file-earmark-image me-1"></i>' + label + '</button>';
+          }
+          if (label === 'หน้าสมุดบัญชี' && record.status !== 'หมดอายุประกัน') {
+              return '<button type="button" class="btn btn-sm btn-secondary mb-2 me-2 align-top" onclick="triggerMissingUpload(' + rowNum + ')" title="คลิกเพื่อแนบหน้าสมุดบัญชีเพิ่มเติม">ไม่มี' + label + '</button>';
+          }
+          if (label === 'เอกสารอื่นๆ' && record.status !== 'หมดอายุประกัน') {
+              return '<button type="button" class="btn btn-sm btn-secondary mb-2 me-2 align-top" onclick="triggerMissingOtherDocUpload(' + rowNum + ')" title="คลิกเพื่อแนบเอกสารอื่นๆเพิ่มเติม">ไม่มี' + label + '</button>';
+          }
+          return '<span class="badge bg-secondary mb-2 me-2 py-2 px-3 fw-normal align-top">ไม่มี' + label + '</span>';
+      };
+
+      var html = '<div class="row mb-3 border-bottom pb-3">' +
+            '<div class="col-md-6 mb-2 mb-md-0"><small class="text-muted d-block">วันที่บันทึก:</small> <strong>' + record.timestamp + '</strong></div>' +
+            '<div class="col-md-6"><small class="text-muted d-block">สถานะ / เอกสาร:</small> <span class="text-primary fw-bold">' + record.status + '</span> <span class="text-muted mx-1">|</span> <span class="text-success fw-bold">' + record.checkDoc + '</span></div>' +
+        '</div>';
+
+      if (currentUserLevel === 'HR' && record.status !== 'หมดอายุประกัน') {
+          html += '<div class="row g-3 mb-3">' +
+                '<div class="col-md-6"><label class="small text-muted">ชื่อ-นามสกุล:</label><input type="text" id="editName" class="form-control form-control-sm" value="' + record.name + '"></div>' +
+                '<div class="col-md-6"><label class="small text-muted">รหัสพนักงาน:</label><input type="text" id="editEmpId" class="form-control form-control-sm" value="' + record.empId + '"></div>' +
+                '<div class="col-md-6"><label class="small text-muted">เลขบัตรประชาชน:</label><input type="text" id="editIdCard" class="form-control form-control-sm" value="' + record.idCard + '"></div>' +
+                '<div class="col-md-6"><label class="small text-muted">วันเกิด:</label><input type="date" id="editDob" class="form-control form-control-sm" value="' + record.rawDob + '"></div>' +
+                '<div class="col-12"><label class="small text-muted">ที่อยู่:</label><textarea id="editAddress" class="form-control form-control-sm" rows="2">' + record.address + '</textarea></div>' +
+                '<div class="col-md-6"><label class="small text-muted">เบอร์โทรศัพท์:</label><input type="text" id="editTel" class="form-control form-control-sm" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, \'\');" value="' + record.tel + '"></div>' +
+                '<div class="col-md-6"><label class="small text-muted">แผนก / สังกัด:</label><input type="text" id="editDepartment" class="form-control form-control-sm" value="' + record.department + '"></div>' +
+                '<div class="col-md-6"><label class="small text-muted">ตำแหน่ง:</label><input type="text" id="editPosition" class="form-control form-control-sm" value="' + record.position + '"></div>' +
+                '<div class="col-md-6"><label class="small text-muted">สาขา:</label><input type="text" id="editBranch" class="form-control form-control-sm" value="' + record.branch + '"></div>' +
+                '<div class="col-md-6"><label class="small text-muted">วันเริ่มงาน:</label><input type="date" id="editStartDate" class="form-control form-control-sm" value="' + record.rawStartDate + '"></div>' +
+                '<div class="col-md-6"><label class="small text-muted">เริ่มคุ้มครอง:</label><input type="date" id="editCovStart" class="form-control form-control-sm" value="' + record.rawCovStart + '" onchange="autoCalcEditCovEnd(this.value)"></div>' +
+                '<div class="col-md-6"><label class="small text-muted">สิ้นสุดคุ้มครอง:</label><input type="date" id="editCovEnd" class="form-control form-control-sm" value="' + record.rawCovEnd + '"></div>' +
+            '</div>';
+            
+          html += '<div class="mt-4 pt-3 border-top bg-light p-3 rounded">' +
+                '<h6 class="mb-3 text-dark fw-bold"><i class="bi bi-paperclip me-2"></i>ไฟล์เอกสารแนบ (คลิกเพื่อดู)</h6>' +
+                getFileLink(record.reqFormUrl, 'ใบคำขอซื้อ', record.rowNumber) +
+                getSlipLinks(record.slipUrl, record.rowNumber, record.status, record.slipStatus) +
+                getFileLink(record.idCopyUrl, 'สำเนาบัตรประชาชน', record.rowNumber) +
+                getFileLink(record.bankBookUrl, 'หน้าสมุดบัญชี', record.rowNumber) +
+                getFileLink(record.otherDocUrl, 'เอกสารอื่นๆ', record.rowNumber) +
+            '</div>';
+
+          var slipSectionStyle = (currentStatusFilter === 'รอแจ้งเข้าประกัน' || record.status === 'รอแจ้งเข้าประกัน') ? 'block' : 'none';
+          html += '<div class="mt-4 pt-3 border-top bg-white border border-primary p-3 rounded shadow-sm" style="display: ' + slipSectionStyle + ';">' +
+                '<h6 class="mb-3 text-primary fw-bold"><i class="bi bi-receipt me-2"></i>สถานะการตรวจสอบสลิปโอนเงิน (เฉพาะ HR)</h6>' +
+                '<div class="row g-3 align-items-end">' +
+                    '<div class="col-md-6">' +
+                        '<select id="editSlipStatus" class="form-select form-select-sm">' +
+                            '<option value="" ' + (record.slipStatus === '' ? 'selected' : '') + '>-- รอตรวจสอบ --</option>' +
+                            '<option value="สลิปโอนเงินถูกต้อง" ' + (record.slipStatus === 'สลิปโอนเงินถูกต้อง' ? 'selected' : '') + '>สลิปโอนเงินถูกต้อง</option>' +
+                            '<option value="สลิปโอนเงินไม่ถูกต้อง" ' + (record.slipStatus === 'สลิปโอนเงินไม่ถูกต้อง' ? 'selected' : '') + '>สลิปโอนเงินไม่ถูกต้อง</option>' +
+                        '</select>' +
+                    '</div>' +
+                    '<div class="col-md-6">' +
+                        '<button type="button" class="btn btn-primary btn-sm" onclick="updateSlipStatusOnly(' + record.rowNumber + ', ' + index + ')">สถานะสลิป</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+
+          var cancelSectionStyle = (currentStatusFilter === 'รอแจ้งออก' || currentStatusFilter === 'แจ้งเข้าแล้ว' || record.status === 'แจ้งเข้าแล้ว' || record.status === 'รอแจ้งออก') ? 'block' : 'none';
+          html += '<div class="mt-4 pt-3 border-top bg-white border border-danger p-3 rounded shadow-sm" style="display: ' + cancelSectionStyle + ';">' +
+                '<h6 class="mb-3 text-danger fw-bold"><i class="bi bi-box-arrow-right me-2"></i>สถานะการแจ้งออก (เฉพาะ HR)</h6>' +
+                '<div class="row g-2 align-items-end">' +
+                    '<div class="col-md-5">' +
+                        '<select id="editCancelStatus" class="form-select form-select-sm" onchange="toggleEditCancelDate()">' +
+                            '<option value="" ' + (record.cancelStatus === '' ? 'selected' : '') + '>-- ไม่ระบุ --</option>' +
+                            '<option value="ลาออก" ' + (record.cancelStatus === 'ลาออก' ? 'selected' : '') + '>ลาออก</option>' +
+                            '<option value="มีผู้ค้ำประกัน" ' + (record.cancelStatus === 'มีผู้ค้ำประกัน' ? 'selected' : '') + '>มีผู้ค้ำประกัน</option>' +
+                        '</select>' +
+                    '</div>' +
+                    '<div class="col-md-4" id="editCancelDateDiv" style="display: ' + (record.cancelStatus !== '' ? 'block' : 'none') + ';">' +
+                        '<label class="form-label small text-muted mb-1" style="font-size: 0.75rem;">วันที่ออกประกัน</label>' +
+                        '<input type="date" id="editCancelDate" class="form-control form-control-sm" value="' + record.rawCancelDate + '">' +
+                    '</div>' +
+                    '<div class="col-md-3">' +
+                        '<button type="button" class="btn btn-danger btn-sm w-100" onclick="updateCancelStatusOnly(' + record.rowNumber + ', ' + index + ')">อัปเดตสถานะ</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+          
+          var approveBtn = '';
+          if (record.status === 'รอแจ้งเข้าประกัน') {
+              if (record.slipStatus === 'สลิปโอนเงินถูกต้อง') {
+                  approveBtn = '<button type="button" class="btn btn-info text-white me-auto" onclick="approveInsurance(' + record.rowNumber + ')"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งเข้า</button>';
+              } else {
+                  approveBtn = '<button type="button" class="btn btn-secondary text-white me-auto" onclick="Swal.fire({icon: \'warning\', title: \'ไม่สามารถอนุมัติได้\', text: \'กรุณาตรวจสอบและตั้งค่าสลิปให้ถูกต้องก่อน\'})"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งเข้า</button>';
+              }
+          } else if (record.status === 'รอแจ้งออก') {
+              approveBtn = '<button type="button" class="btn btn-danger text-white me-auto" onclick="approveCancelInsurance(' + record.rowNumber + ')"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งออก</button>';
+          }
+          
+          modalFooter.innerHTML = approveBtn +
+              '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>' +
+              '<button type="button" class="btn btn-success" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
+          
+      } else {
+          html += '<div class="row g-3 mb-3">' +
+                '<div class="col-md-6"><small class="text-muted d-block">ชื่อ-นามสกุล:</small> <span>' + record.name + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">รหัสพนักงาน:</small> <span>' + record.empId + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">เลขบัตรประชาชน:</small> <span>' + record.idCard + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">วันเกิด:</small> <span>' + record.dob + '</span></div>' +
+                '<div class="col-12"><small class="text-muted d-block">ที่อยู่:</small> <span>' + record.address + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">เบอร์โทรศัพท์:</small> <span>' + record.tel + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">แผนก / สังกัด:</small> <span>' + record.department + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">ตำแหน่ง:</small> <span>' + record.position + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">สาขา:</small> <span>' + record.branch + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">วันเริ่มงาน:</small> <span>' + record.startDate + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">เริ่มคุ้มครอง:</small> <span class="text-success">' + record.coverageStart + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">สิ้นสุดคุ้มครอง:</small> <span class="text-danger">' + record.coverageEnd + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">สถานะการแจ้งออก:</small> <span class="text-dark">' + (record.cancelStatus || '-') + '</span></div>' +
+                '<div class="col-md-6"><small class="text-muted d-block">วันที่ออกประกัน:</small> <span class="text-dark">' + (record.cancelDate || '-') + '</span></div>' +
+            '</div>' +
+            '<div class="mt-4 pt-3 border-top bg-light p-3 rounded">' +
+                '<h6 class="mb-3 text-dark fw-bold"><i class="bi bi-paperclip me-2"></i>ไฟล์เอกสารแนบ</h6>' +
+                getFileLink(record.reqFormUrl, 'ใบคำขอซื้อ', record.rowNumber) +
+                getSlipLinks(record.slipUrl, record.rowNumber, record.status, record.slipStatus) +
+                getFileLink(record.idCopyUrl, 'สำเนาบัตรประชาชน', record.rowNumber) +
+                getFileLink(record.bankBookUrl, 'หน้าสมุดบัญชี', record.rowNumber) +
+                getFileLink(record.otherDocUrl, 'เอกสารอื่นๆ', record.rowNumber) +
+            '</div>';
+          
+          modalFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>';
+      }
+      
+      modalBody.innerHTML = html;
+      var modalEl = document.getElementById('detailModal');
+      var modal = bootstrap.Modal.getInstance(modalEl);
+      if (!modal) {
+          modal = new bootstrap.Modal(modalEl);
+      }
+      modal.show();
+    }
+
+    function saveFullRecord(rowNumber) {
+        var btn = document.querySelector("#detailModalFooter .btn-success");
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังบันทึก...';
+        btn.disabled = true;
+
+        var data = {
+            name: document.getElementById("editName") ? document.getElementById("editName").value : "",
+            empId: document.getElementById("editEmpId") ? document.getElementById("editEmpId").value : "",
+            idCard: document.getElementById("editIdCard") ? document.getElementById("editIdCard").value : "",
+            dob: document.getElementById("editDob") ? document.getElementById("editDob").value : "",
+            address: document.getElementById("editAddress") ? document.getElementById("editAddress").value : "",
+            tel: document.getElementById("editTel") ? document.getElementById("editTel").value : "",
+            department: document.getElementById("editDepartment") ? document.getElementById("editDepartment").value : "",
+            position: document.getElementById("editPosition") ? document.getElementById("editPosition").value : "",
+            branch: document.getElementById("editBranch") ? document.getElementById("editBranch").value : "",
+            startDate: document.getElementById("editStartDate") ? document.getElementById("editStartDate").value : "",
+            coverageStart: document.getElementById("editCovStart") ? document.getElementById("editCovStart").value : "",
+            coverageEnd: document.getElementById("editCovEnd") ? document.getElementById("editCovEnd").value : "",
+            cancelStatus: document.getElementById("editCancelStatus") ? document.getElementById("editCancelStatus").value : "",
+            cancelDate: document.getElementById("editCancelDate") ? document.getElementById("editCancelDate").value : "",
+            slipStatus: document.getElementById("editSlipStatus") ? document.getElementById("editSlipStatus").value : ""
+        };
+
+        google.script.run.withSuccessHandler(function(res) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            if(res === 'success') {
+                Swal.fire({icon: 'success', title: 'บันทึกสำเร็จ', showConfirmButton: false, timer: 1500});
+                fetchHRTableData(); 
+            } else {
+                Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: res});
+            }
+        }).updateFullInsuranceRecord(rowNumber, data);
+    }
+
+    function updateSlipStatusOnly(rowNumber, index) {
+        var newStatus = document.getElementById("editSlipStatus").value;
+        Swal.fire({title: 'กำลังอัปเดต...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+        google.script.run.withSuccessHandler(function(res) {
+            if(res === 'success') {
+                Swal.fire({icon: 'success', title: 'อัปเดตสถานะสลิปสำเร็จ', showConfirmButton: false, timer: 1500});
+                currentRecords[index].slipStatus = newStatus;
+                showDetails(index);
+                fetchHRTableData();
+            } else {
+                Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: res});
+            }
+        }).updateSlipStatusInSheet(rowNumber, newStatus);
+    }
+
+    function updateCancelStatusOnly(rowNumber, index) {
+        var newCancelStatus = document.getElementById("editCancelStatus").value;
+        var newCancelDate = document.getElementById("editCancelDate").value;
+
+        Swal.fire({title: 'กำลังอัปเดต...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+        google.script.run.withSuccessHandler(function(res) {
+            if(res === 'success') {
+                Swal.fire({icon: 'success', title: 'อัปเดตสถานะการแจ้งออกสำเร็จ', showConfirmButton: false, timer: 1500});
+                currentRecords[index].cancelStatus = newCancelStatus;
+                currentRecords[index].rawCancelDate = newCancelDate;
+                
+                if(newCancelStatus !== "") {
+                    if(currentRecords[index].status !== 'แจ้งออกแล้ว' && currentRecords[index].status !== 'แจ้งออกประกัน') {
+                        currentRecords[index].status = 'รอแจ้งออก';
+                    }
+                } else {
+                    if(currentRecords[index].status === 'รอแจ้งออก' || currentRecords[index].status === 'แจ้งออกแล้ว') {
+                        currentRecords[index].status = 'แจ้งเข้าแล้ว';
+                    }
+                }
+
+                if(newCancelDate) {
+                    var d = new Date(newCancelDate);
+                    if (!isNaN(d.getTime())) {
+                        var day = ('0' + d.getDate()).slice(-2);
+                        var month = ('0' + (d.getMonth() + 1)).slice(-2);
+                        var year = d.getFullYear();
+                        currentRecords[index].cancelDate = day + '/' + month + '/' + year;
+                    }
+                } else {
+                    currentRecords[index].cancelDate = '-';
+                }
+
+                showDetails(index);
+                fetchHRTableData();
+            } else {
+                Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: res});
+            }
+        }).updateCancelStatusInSheetOnly(rowNumber, newCancelStatus, newCancelDate);
+    }
+
+    function approveInsurance(rowNumber) {
+        Swal.fire({
+            title: 'ยืนยันแจ้งเข้าประกัน?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยัน',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({title: 'กำลังดำเนินการ...', didOpen: () => { Swal.showLoading(); }});
+                google.script.run.withSuccessHandler(function(res) {
+                    if(res === 'success') {
+                        Swal.fire({icon: 'success', title: 'ยืนยันสำเร็จ', timer: 1500, showConfirmButton: false});
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+                        if(modal) modal.hide();
+                        fetchHRTableData();
+                    } else {
+                        Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: res});
+                    }
+                }).confirmInsuranceRegistration(rowNumber);
+            }
+        });
+    }
+
+    function approveCancelInsurance(rowNumber) {
+        var cancelStatus = document.getElementById("editCancelStatus").value;
+        var cancelDate = document.getElementById("editCancelDate").value;
+
+        if (cancelStatus === "") {
+            Swal.fire({
+                icon: 'warning', 
+                title: 'ไม่สามารถแจ้งออกได้', 
+                text: 'คุณเลือก "ไม่ระบุ" กรุณาระบุสถานะการแจ้งออก\nหรือหากต้องการยกเลิกการแจ้งออก ให้กด "อัปเดตสถานะ" เพื่อเปลี่ยนสถานะกลับเป็น "แจ้งเข้าแล้ว"'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'ยืนยันแจ้งออกประกัน?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยัน',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({title: 'กำลังดำเนินการ...', didOpen: () => { Swal.showLoading(); }});
+                google.script.run.withSuccessHandler(function(res) {
+                    if(res === 'success') {
+                        Swal.fire({icon: 'success', title: 'ยืนยันสำเร็จ', timer: 1500, showConfirmButton: false});
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+                        if(modal) modal.hide();
+                        fetchHRTableData();
+                    } else {
+                        Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: res});
+                    }
+                }).confirmCancelRegistration(rowNumber, cancelStatus, cancelDate);
+            }
+        });
+    }
+
+    function deleteSlipUser(rowNumber) {
+        Swal.fire({
+            title: 'ยืนยันการลบสลิป?',
+            text: "สลิปเดิมจะถูกลบออกเพื่อรอแนบใหม่",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ลบ',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if(result.isConfirmed) {
+                Swal.fire({title: 'กำลังลบ...', didOpen: () => { Swal.showLoading(); }});
+                google.script.run.withSuccessHandler(function(res) {
+                    if(res === 'success') {
+                        Swal.fire({icon: 'success', title: 'ลบสำเร็จ', timer: 1500});
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+                        if(modal) modal.hide();
+                        if(currentUserLevel === 'HR' || currentUserLevel === 'JMI') fetchHRTableData();
+                        else fetchTableData(document.getElementById("idCard").value);
+                    }
+                }).deleteSlipInSheet(rowNumber);
+            }
+        });
+    }
+
+    function triggerMissingUpload(rowNumber) {
+        document.getElementById("missingRowNumber").value = rowNumber;
+        document.getElementById("missingBankBookInput").click();
+    }
+    function submitMissingUpload() {
+        var form = document.getElementById("missingUploadForm");
+        Swal.fire({title: 'กำลังอัปโหลด...', didOpen: () => { Swal.showLoading(); }});
+        google.script.run.withSuccessHandler(function(res){
+            if(res === 'success') {
+                Swal.fire({icon: 'success', title: 'อัปโหลดสำเร็จ', timer: 1500});
+                var modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+                if(modal) modal.hide();
+                if(currentUserLevel === 'HR' || currentUserLevel === 'JMI') fetchHRTableData();
+                else fetchTableData(document.getElementById("idCard").value); 
+            }
+        }).processMissingBankBookUpload(form);
+    }
+
+    function triggerMissingSlipUpload(rowNumber) {
+        document.getElementById("missingSlipRowNumber").value = rowNumber;
+        document.getElementById("missingSlipInput").click();
+    }
+    function submitMissingSlipUpload() {
+        var form = document.getElementById("missingSlipUploadForm");
+        Swal.fire({title: 'กำลังอัปโหลด...', didOpen: () => { Swal.showLoading(); }});
+        google.script.run.withSuccessHandler(function(res){
+            if(res === 'success') {
+                Swal.fire({icon: 'success', title: 'อัปโหลดสำเร็จ', timer: 1500});
+                var modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+                if(modal) modal.hide();
+                if(currentUserLevel === 'HR' || currentUserLevel === 'JMI') fetchHRTableData();
+                else fetchTableData(document.getElementById("idCard").value);
+            }
+        }).processMissingSlipUpload(form);
+    }
+
+    function triggerMissingOtherDocUpload(rowNumber) {
+        document.getElementById("missingOtherDocRowNumber").value = rowNumber;
+        document.getElementById("missingOtherDocInput").click();
+    }
+    function submitMissingOtherDocUpload() {
+        var form = document.getElementById("missingOtherDocUploadForm");
+        Swal.fire({title: 'กำลังอัปโหลด...', didOpen: () => { Swal.showLoading(); }});
+        google.script.run.withSuccessHandler(function(res){
+            if(res === 'success') {
+                Swal.fire({icon: 'success', title: 'อัปโหลดสำเร็จ', timer: 1500});
+                var modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+                if(modal) modal.hide();
+                if(currentUserLevel === 'HR' || currentUserLevel === 'JMI') fetchHRTableData();
+                else fetchTableData(document.getElementById("idCard").value);
+            }
+        }).processMissingOtherDocUpload(form);
+    }
+
+    function exportExcel() {
+        let rows = document.querySelectorAll("#hrTableBody tr");
+        let visibleRecords = [];
+
+        rows.forEach(tr => {
+            if (tr.style.display !== 'none' && !tr.classList.contains("no-data-row")) {
+                let idx = tr.getAttribute("data-index");
+                if (idx !== null && currentRecords[idx]) {
+                    let mainChk = tr.querySelector('.main-chk');
+                    let anyChecked = document.querySelectorAll('.main-chk:checked').length > 0;
+                    if (!anyChecked || (mainChk && mainChk.checked)) {
+                         visibleRecords.push(currentRecords[idx]);
+                    }
+                }
+            }
+        });
+
+        if (visibleRecords.length === 0) {
+            Swal.fire({icon: 'info', title: 'ไม่มีข้อมูล', text: 'ไม่พบข้อมูลที่กำลังแสดงอยู่เพื่อ Export (หรือคุณอาจไม่ได้ติ๊กเลือกข้อมูล)'});
+            return;
+        }
+
+        let tableHtml = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head><meta charset="UTF-8"></head>
+            <body>
+                <table border="1" style="border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #4e54c8; color: #ffffff; font-weight: bold;">
+                            <th>ID Card</th>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Company</th>
+                            <th>Employee Status</th>
+                            <th>วดป เกิด</th>
+                            <th>Tel</th>
+                            <th>ที่อยู่</th>
+                            <th>สาขา</th>
+                            <th>ประเภทการซื้อประกัน</th>
+                            <th>เริ่มคุ้มครอง</th>
+                            <th>สิ้นสุดคุ้มครอง</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        visibleRecords.forEach(row => {
+            tableHtml += `
+                <tr>
+                    <td style="mso-number-format:'\\@';">${row.idCard || '-'}</td>
+                    <td style="mso-number-format:'\\@';">${row.empId || '-'}</td>
+                    <td>${row.name || '-'}</td>
+                    <td>${row.position || '-'}</td>
+                    <td>${row.company || '-'}</td>
+                    <td>${row.empStatus || '-'}</td>
+                    <td>${row.dob || '-'}</td>
+                    <td style="mso-number-format:'\\@';">${row.tel || '-'}</td>
+                    <td>${row.address || '-'}</td>
+                    <td>${row.branch || '-'}</td>
+                    <td>${row.insuranceType || '-'}</td>
+                    <td>${row.coverageStart || '-'}</td>
+                    <td>${row.coverageEnd || '-'}</td>
+                </tr>
+            `;
+        });
+
+        tableHtml += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        var blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        
+        let statusName = currentStatusFilter === 'ทั้งหมด' ? 'All' : currentStatusFilter;
+        a.download = 'Insurance_Data_' + statusName + '_' + new Date().getTime() + '.xls';
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        let selectAllMain = document.getElementById("selectAllMain");
+        if(selectAllMain) {
+            selectAllMain.checked = false;
+            toggleSelectAllMain(selectAllMain);
+        }
+    }
+
+    function handleSubmit() {
+      document.getElementById("submitBtn").disabled = true;
+      document.getElementById("submitText").innerText = " กำลังบันทึกข้อมูลและอัปโหลดไฟล์...";
+      document.getElementById("submitIcon").classList.add("d-none");
+      document.getElementById("submitLoader").classList.remove("d-none");
+
+      var formObject = document.getElementById("myForm");
+
+      google.script.run.withSuccessHandler(function(response) {
+        document.getElementById("submitBtn").disabled = false;
+        document.getElementById("submitText").innerText = " บันทึกข้อมูลการซื้อประกัน";
+        document.getElementById("submitIcon").classList.remove("d-none");
+        document.getElementById("submitLoader").classList.add("d-none");
+
+        if (response === "success") {
+          Swal.fire({
+            icon: 'success',
+            title: 'บันทึกสำเร็จ!',
+            text: 'ข้อมูลและเอกสารของคุณถูกส่งเข้าระบบเรียบร้อยแล้ว',
+            confirmButtonColor: '#11998e'
+          }).then((result) => {
+             var tempIdCard = document.getElementById("idCard").value;
+             var tempEmpId = document.getElementById("empId").value;
+             var tempName = document.getElementById("name").value;
+             var tempPosition = document.getElementById("position").value;
+             var tempDepartment = document.getElementById("department").value;
+             
+             var tempDob = document.getElementById("dob").value;
+             var tempTel = document.getElementById("tel").value;
+             var tempAddress = document.getElementById("address").value;
+             var tempBranch = document.getElementById("branch").value;
+             var tempStartDate = document.getElementById("startDate").value;
+
+             document.getElementById("myForm").reset();
+
+             document.getElementById("idCard").value = tempIdCard;
+             document.getElementById("empId").value = tempEmpId;
+             document.getElementById("name").value = tempName;
+             document.getElementById("position").value = tempPosition;
+             document.getElementById("department").value = tempDepartment;
+             
+             document.getElementById("dob").value = tempDob;
+             document.getElementById("tel").value = tempTel;
+             document.getElementById("address").value = tempAddress;
+             document.getElementById("branch").value = tempBranch;
+             document.getElementById("startDate").value = tempStartDate;
+
+             fetchTableData(tempIdCard);
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: response,
+            confirmButtonColor: '#d33'
+          });
+        }
+      }).submitData(formObject);
+    }
+    
+    function clearAllFilters() {
+        document.getElementById("dateStart").value = "";
+        document.getElementById("dateEnd").value = "";
+        document.getElementById("dateFilterType").value = "0";
+        document.querySelectorAll('.col-filter').forEach(inp => inp.value = "");
+        
+        let btnAll = document.getElementById('btnStatusAll');
+        if(btnAll) {
+            filterByStatus('ทั้งหมด', btnAll);
+        } else {
+            applyAllFilters();
+        }
+    }
+  </script>
+</body>
+</html>
