@@ -12,15 +12,20 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
-    body { font-family: 'Kanit', sans-serif; font-weight: 300; background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); min-height: 100vh; padding: 30px 15px; color: #333; }
-    .glass-card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); padding: 40px; width: 100%; margin: 0 auto; transition: all 0.3s ease; }
+    body { font-family: 'Kanit', sans-serif; font-weight: 300; background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); min-height: 100vh; padding: 15px; padding-top: 30px; color: #333; }
+    .glass-card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); padding: 20px; width: 100%; margin: 0 auto; transition: all 0.3s ease; }
+    @media (min-width: 768px) { .glass-card { padding: 40px; } }
     
-    /* ล็อกอินโชว์เป็นค่าเริ่มต้น แต่จะซ่อนเร็วมากถ้าเคยล็อกอิน (ใช้ JS ควบคุม) */
     .login-card { max-width: 450px; margin-top: 5vh; } 
     .form-card { max-width: 800px; display: none; margin-bottom: 20px; } 
-    .table-card { max-width: 1250px; display: none; margin-top: 20px; padding: 30px; } 
-    .hr-card { max-width: 100%; display: none; margin-top: 20px; padding: 30px; } 
-    .logo-icon { font-size: 3.5rem; color: #4e54c8; margin-bottom: 10px; }
+    .table-card { max-width: 1250px; display: none; margin-top: 20px; padding: 15px; } 
+    @media (min-width: 768px) { .table-card { padding: 30px; } }
+    .hr-card { max-width: 100%; display: none; margin-top: 20px; padding: 15px; } 
+    @media (min-width: 768px) { .hr-card { padding: 30px; } }
+    
+    .logo-icon { font-size: 2.5rem; color: #4e54c8; margin-bottom: 10px; }
+    @media (min-width: 768px) { .logo-icon { font-size: 3.5rem; } }
+    
     .form-control { border-radius: 10px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s; }
     .form-control:focus { box-shadow: 0 0 0 0.25rem rgba(78, 84, 200, 0.25); border-color: #4e54c8; }
     .readonly-field { background-color: #f4f6f9; color: #6c757d; border: 1px dashed #ced4da; }
@@ -28,12 +33,44 @@
     .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(78, 84, 200, 0.4); }
     .btn-success-custom { background: linear-gradient(45deg, #11998e, #38ef7d); border: none; border-radius: 10px; padding: 14px; font-weight: 500; font-size: 1.1rem; transition: transform 0.2s, box-shadow 0.2s; }
     .btn-success-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(17, 153, 142, 0.4); }
-    .section-title { font-size: 1.2rem; font-weight: 600; color: #4e54c8; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 20px; margin-top: 30px; }
+    .section-title { font-size: 1.1rem; font-weight: 600; color: #4e54c8; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 20px; margin-top: 30px; }
+    @media (min-width: 768px) { .section-title { font-size: 1.2rem; } }
     .input-group-text { background-color: white; border-radius: 10px 0 0 10px; border-right: none; }
     .input-group .form-control { border-left: none; }
-    .custom-table-container { border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e0; background-color: white; }
-    .custom-table th { background-color: #4e54c8; color: #ffffff; font-weight: 400; font-size: 0.85rem; vertical-align: middle; white-space: nowrap; }
-    .custom-table tbody td { font-weight: 300; font-size: 0.85rem; vertical-align: middle; white-space: nowrap; }
+
+    /* ปรับแต่งตารางให้เลื่อน ซ้าย-ขวา และ ขึ้น-ลง ได้อิสระ พร้อมทำ Sticky Header */
+    .custom-table-container { 
+        border-radius: 10px; 
+        overflow: auto; /* เลื่อนได้ทั้ง 2 แกน */
+        max-height: 65vh; /* จำกัดความสูงสูงสุดเพื่อให้เลื่อนขึ้น-ลงได้ */
+        border: 1px solid #e0e0e0; 
+        background-color: white; 
+        -webkit-overflow-scrolling: touch; 
+    }
+    .custom-table th { 
+        position: sticky; 
+        top: 0; 
+        z-index: 5; /* ให้อยู่เหนือเนื้อหาในตาราง */
+        background-color: #4e54c8; 
+        color: #ffffff; 
+        font-weight: 400; 
+        font-size: 0.85rem; 
+        vertical-align: middle; 
+        white-space: nowrap; 
+        min-width: 100px; 
+    }
+    .custom-table tbody td { 
+        font-weight: 300; 
+        font-size: 0.85rem; 
+        vertical-align: middle; 
+        white-space: nowrap; 
+        min-width: 100px; 
+    }
+    /* ปรับแต่งหน้าตา Scrollbar */
+    .custom-table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+    .custom-table-container::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 10px; }
+    .custom-table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    
     .status-badge { display: inline-block; width: 130px; text-align: center; font-weight: 400; font-size: 0.75rem; padding: 6px 12px; }
     .doc-badge { display: inline-block; width: 120px; text-align: center; font-weight: 400; font-size: 0.75rem; padding: 6px 12px; }
     .doc-cell-wrapper { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 5px; }
@@ -43,9 +80,11 @@
     .table .form-check-input:hover { border-color: #4e54c8; }
     .custom-table tbody tr { transition: background-color 0.2s; }
     .custom-table tbody tr:hover { background-color: #f1f3ff; }
-    .custom-table-container::-webkit-scrollbar { height: 8px; }
-    .custom-table-container::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 10px; }
     .col-filter { font-size: 0.8rem; padding: 4px 8px; margin-top: 8px; font-weight: normal; border-radius: 5px; width: 100%; }
+    
+    #statusFilterGroup .btn { flex: 1 1 auto; border-radius: 5px !important; margin-bottom: 5px; font-size: 0.85rem; }
+    @media (min-width: 768px) { #statusFilterGroup .btn { margin-bottom: 0; } }
+
     .email-tab-link { color: #4e54c8 !important; font-weight: 600 !important; border: 2px solid #4e54c8 !important; border-bottom: none !important; border-radius: 10px 10px 0 0 !important; background-color: #f8f9fa !important; margin-right: 5px; transition: all 0.3s ease; }
     .email-tab-link.active { background-color: #4e54c8 !important; color: white !important; }
     .email-tab-link:not(.active):hover { background-color: #eef2ff !important; }
@@ -75,15 +114,15 @@
 </div>
 
 <div class="glass-card table-card" id="tableSection">
-    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 mt-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pb-2 mb-3 mt-0">
         <div class="section-title border-bottom-0 mb-0 mt-0"><i class="bi bi-table me-2"></i>รายการซื้อค้ำประกันของคุณ</div>
-        <div>
+        <div class="mt-2 mt-md-0">
             <button id="btnShowForm" class="btn btn-success btn-sm rounded-pill shadow-sm px-3" onclick="showInsuranceForm()" style="display:none;"><i class="bi bi-plus-circle me-1"></i> ซื้อค้ำประกัน</button>
             <button id="btnUserLogout" type="button" class="btn btn-sm btn-danger rounded-pill px-3 ms-2" onclick="logoutSystem()" style="display:none;"><i class="bi bi-box-arrow-right me-1"></i>ออก</button>
         </div>
     </div>
-    <p class="text-muted small mb-3"><i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดเพิ่มเติม (เลื่อนตารางซ้าย-ขวาเพื่อดูข้อมูลเพิ่มเติม)</p>
-    <div class="custom-table-container table-responsive">
+    <p class="text-muted small mb-3"><i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดเพิ่มเติม (เลื่อนตารางซ้าย-ขวา/ขึ้น-ลง เพื่อดูข้อมูลเพิ่มเติม)</p>
+    <div class="custom-table-container shadow-sm">
       <table class="table custom-table table-bordered align-middle text-center mb-0">
         <thead>
           <tr>
@@ -107,7 +146,7 @@
       <div class="modal-header border-0 pb-0 justify-content-end">
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body p-4 pt-0">
+      <div class="modal-body p-3 p-md-4 pt-0">
           <div class="text-center mb-4 position-relative">
             <i class="bi bi-clipboard2-check-fill logo-icon" style="color: #11998e;"></i>
             <h3 class="fw-bold">ฟอร์มซื้อประกันการทำงาน</h3>
@@ -152,7 +191,7 @@
                 <h6 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="bi bi-credit-card-2-front-fill me-2"></i>ช่องทางการชำระเบี้ยประกันภัย</h6>
                 <div class="row g-3">
                   <div class="col-md-12">
-                    <div class="p-3 rounded border text-center text-md-start position-relative" style="background-color: #f8f9fa; border: 2px solid #e0e0e0 !important;">
+                    <div class="p-2 p-md-3 rounded border text-center text-md-start position-relative" style="background-color: #f8f9fa; border: 2px solid #e0e0e0 !important;">
                         <div class="row align-items-center">
                             <div class="col-md-8">
                                 <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-2">
@@ -163,7 +202,7 @@
                                 <p class="mb-1 fs-6 text-muted">เลขที่บัญชี: <strong class="text-primary fs-5">140-2-50751-5</strong><button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0 px-2 rounded-pill" onclick="copyText('1402507515', 'เลขบัญชี')"><i class="bi bi-clipboard"></i></button></p>
                                 <p class="mb-0 fs-6 text-muted">ยอดชำระ: <strong class="text-danger fs-5">950.16</strong> <strong>บาท</strong><button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0 px-2 rounded-pill" onclick="copyText('950.16', 'ยอดเงิน')"><i class="bi bi-clipboard"></i></button></p>
                             </div>
-                            <div class="col-md-4 text-center mt-3 mt-md-0 pt-2 pt-md-0" style="border-left: 2px dashed #dee2e6; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <div class="col-md-4 text-center mt-3 mt-md-0 pt-3 pt-md-0" style="border-left: 2px dashed #dee2e6; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                                 <img id="slipPreview" src="" alt="ภาพสลิปที่แนบ" class="shadow-sm border border-secondary" style="display:none; width: 120px; height: 120px; object-fit: cover; border-radius: 10px;">
                                 <div id="noSlipPlaceholder" class="text-muted"><i class="bi bi-image fs-2 opacity-25"></i><p class="small mt-1 mb-0">ตัวอย่างสลิปที่แนบ</p></div>
                             </div>
@@ -200,7 +239,7 @@
 <div class="glass-card hr-card" id="hrSection">
     <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-4 mt-2">
        <div class="section-title border-bottom-0 mb-0 mt-0" id="adminSectionTitle"><i class="bi bi-people-fill me-2"></i>ระบบจัดการสำหรับ HR</div>
-       <div class="d-flex align-items-center gap-2 mt-2 mt-md-0" id="hrButtonsContainer">
+       <div class="d-flex flex-wrap align-items-center gap-2 mt-2 mt-md-0" id="hrButtonsContainer">
            <span class="badge bg-primary rounded-pill px-3 py-2" id="hrTotalCount">รวม 0 รายการ</span>
            <button type="button" id="btnApproveInAll" class="btn btn-sm btn-info text-white rounded-pill px-3" style="display:none;" onclick="approveAllInsuranceIn()" title="เลือกอนุมัติรอแจ้งเข้าที่มีสลิปถูกต้อง"><i class="bi bi-check-all me-1"></i>อนุมัติแจ้งเข้า All</button>
            <button type="button" id="btnCancelSelectIn" class="btn btn-sm btn-secondary text-white rounded-pill px-3" style="display:none;" onclick="cancelSelectModeIn()">ยกเลิก</button>
@@ -217,33 +256,35 @@
     <div class="row mb-3 align-items-end g-3">
         <div class="col-lg-6 col-md-12">
             <label class="small text-muted mb-1 d-block"><i class="bi bi-funnel"></i> ตัวกรองสถานะ:</label>
-            <div class="btn-group w-100" role="group">
-              <button type="button" class="btn btn-primary active" id="btnStatusAll" onclick="filterByStatus('ทั้งหมด', this)">ทั้งหมด</button>
-              <button type="button" class="btn btn-outline-info text-dark" id="btnStatusWait" onclick="filterByStatus('รอแจ้งเข้าประกัน', this)">รอแจ้งเข้า</button>
-              <button type="button" class="btn btn-outline-warning text-dark" id="btnStatusIn" onclick="filterByStatus('แจ้งเข้าแล้ว', this)">แจ้งเข้าแล้ว</button>
-              <button type="button" class="btn btn-outline-danger" id="btnStatusWaitOut" onclick="filterByStatus('รอแจ้งออก', this)">รอแจ้งออก</button>
-              <button type="button" class="btn btn-outline-dark" id="btnStatusOut" onclick="filterByStatus('แจ้งออกแล้ว', this)">แจ้งออกแล้ว</button>
-              <button type="button" class="btn btn-outline-secondary" id="btnStatusExp" onclick="filterByStatus('หมดอายุประกัน', this)">หมดอายุ</button>
+            <div class="d-flex flex-wrap w-100 gap-1" id="statusFilterGroup" role="group">
+              <button type="button" class="btn btn-primary active flex-fill" id="btnStatusAll" onclick="filterByStatus('ทั้งหมด', this)">ทั้งหมด</button>
+              <button type="button" class="btn btn-outline-info text-dark flex-fill" id="btnStatusWait" onclick="filterByStatus('รอแจ้งเข้าประกัน', this)">รอแจ้งเข้า</button>
+              <button type="button" class="btn btn-outline-warning text-dark flex-fill" id="btnStatusIn" onclick="filterByStatus('แจ้งเข้าแล้ว', this)">แจ้งเข้าแล้ว</button>
+              <button type="button" class="btn btn-outline-danger flex-fill" id="btnStatusWaitOut" onclick="filterByStatus('รอแจ้งออก', this)">รอแจ้งออก</button>
+              <button type="button" class="btn btn-outline-dark flex-fill" id="btnStatusOut" onclick="filterByStatus('แจ้งออกแล้ว', this)">แจ้งออกแล้ว</button>
+              <button type="button" class="btn btn-outline-secondary flex-fill" id="btnStatusExp" onclick="filterByStatus('หมดอายุประกัน', this)">หมดอายุ</button>
             </div>
         </div>
-        <div class="col-lg-6 col-md-12 text-lg-end text-start">
-            <div class="d-inline-flex align-items-center gap-2 mb-1">
-                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 me-2" onclick="clearAllFilters()" title="เคลียร์ตัวกรอง" style="font-size: 0.8rem;"><i class="bi bi-eraser me-1"></i>เคลียร์</button>
-                <i class="bi bi-calendar-range text-muted"></i>
-                <select id="dateFilterType" class="form-select form-select-sm border-0 shadow-none p-0 text-muted small fw-bold" style="width: auto; cursor: pointer; padding-left: 0 !important;" onchange="applyAllFilters()"><option value="0">กรองจาก วันที่บันทึก:</option><option value="3">กรองจาก เริ่มคุ้มครอง:</option><option value="4">กรองจาก สิ้นสุดคุ้มครอง:</option><option value="7">กรองจาก วันที่ออกประกัน:</option></select>
+        <div class="col-lg-6 col-md-12 text-lg-end text-start mt-3 mt-lg-0">
+            <div class="d-flex flex-wrap align-items-center justify-content-lg-end gap-2 mb-1">
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="clearAllFilters()" title="เคลียร์ตัวกรอง" style="font-size: 0.8rem;"><i class="bi bi-eraser me-1"></i>เคลียร์</button>
+                <div class="d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-calendar-range text-muted"></i>
+                    <select id="dateFilterType" class="form-select form-select-sm border-0 shadow-none p-0 text-muted small fw-bold" style="width: auto; cursor: pointer; padding-left: 0 !important;" onchange="applyAllFilters()"><option value="0">กรองจาก วันที่บันทึก:</option><option value="3">กรองจาก เริ่มคุ้มครอง:</option><option value="4">กรองจาก สิ้นสุดคุ้มครอง:</option><option value="7">กรองจาก วันที่ออกประกัน:</option></select>
                 </div>
+            </div>
             <div class="d-flex justify-content-lg-end align-items-center gap-2">
-                <input type="date" id="dateStart" class="form-control form-control-sm" style="width: 130px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
+                <input type="date" id="dateStart" class="form-control form-control-sm flex-fill" style="max-width: 150px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
                 <span class="text-muted">-</span>
-                <input type="date" id="dateEnd" class="form-control form-control-sm" style="width: 130px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
+                <input type="date" id="dateEnd" class="form-control form-control-sm flex-fill" style="max-width: 150px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
             </div>
         </div>
     </div>
 
-    <p class="text-muted small mb-2" id="hrInstructionText"><i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดและจัดการสถานะการแจ้งออก | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล | เลื่อนตารางซ้าย-ขวาเพื่อดูข้อมูลเพิ่มเติม</p>
-    <div class="custom-table-container table-responsive shadow-sm" style="max-height: 600px; overflow-y: auto;">
+    <p class="text-muted small mb-2" id="hrInstructionText"><i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดและจัดการสถานะการแจ้งออก | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล | เลื่อนตารางซ้าย-ขวา/ขึ้น-ลง เพื่อดูข้อมูลเพิ่มเติม</p>
+    <div class="custom-table-container shadow-sm">
       <table class="table custom-table table-bordered align-middle text-center mb-0" id="hrTable">
-        <thead style="position: sticky; top: 0; z-index: 2; background-color: #4e54c8;">
+        <thead>
           <tr>
             <th width="14%" id="thTimestamp"><div class="date-cell-wrapper"><input type="checkbox" id="selectAllMain" class="form-check-input" onchange="toggleSelectAllMain(this)"> วันที่บันทึก</div></th>
             <th width="9%">รหัสพนักงาน<br><input type="text" class="form-control form-control-sm col-filter" data-col="1" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
@@ -268,7 +309,7 @@
           <h5 class="modal-title" id="detailModalLabel"><i class="bi bi-card-checklist me-2"></i>รายละเอียดการซื้อประกัน</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" id="detailModalBody"></div>
+        <div class="modal-body p-3 p-md-4" id="detailModalBody"></div>
         <div class="modal-footer" id="detailModalFooter">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
         </div>
@@ -286,9 +327,9 @@
               <div class="modal-body p-0" style="background: #eef2ff;">
                   <div class="row m-0">
                       <div id="emailFormArea" class="col-lg-12 p-0 d-flex flex-column" style="min-height: 600px; transition: width 0.3s ease;">
-                          <ul class="nav nav-tabs border-bottom-0 pt-2 px-2" id="emailTab" role="tablist">
-                              <li class="nav-item" role="presentation"><button class="nav-link active email-tab-link w-100 px-4" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-pane" type="button" role="tab" onclick="toggleEmailView('manual')"><i class="bi bi-send me-1"></i> ส่งอีเมลทันที (Manual)</button></li>
-                              <li class="nav-item" role="presentation"><button class="nav-link email-tab-link w-100 px-4" id="auto-tab" data-bs-toggle="tab" data-bs-target="#auto-pane" type="button" role="tab" onclick="toggleEmailView('auto'); resetAutoForm();"><i class="bi bi-robot me-1"></i> สร้าง/แก้ไข ส่งอัตโนมัติ</button></li>
+                          <ul class="nav nav-tabs border-bottom-0 pt-2 px-2 flex-nowrap overflow-auto" id="emailTab" role="tablist">
+                              <li class="nav-item flex-fill" role="presentation"><button class="nav-link active email-tab-link w-100 px-3 px-md-4 text-nowrap" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-pane" type="button" role="tab" onclick="toggleEmailView('manual')"><i class="bi bi-send me-1"></i> ส่งอีเมลทันที (Manual)</button></li>
+                              <li class="nav-item flex-fill" role="presentation"><button class="nav-link email-tab-link w-100 px-3 px-md-4 text-nowrap" id="auto-tab" data-bs-toggle="tab" data-bs-target="#auto-pane" type="button" role="tab" onclick="toggleEmailView('auto'); resetAutoForm();"><i class="bi bi-robot me-1"></i> สร้าง/แก้ไข ส่งอัตโนมัติ</button></li>
                           </ul>
                           <div class="tab-content bg-white p-3 rounded-bottom flex-grow-1" id="emailTabContent">
                               <div class="tab-pane fade show active" id="manual-pane" role="tabpanel">
@@ -300,12 +341,12 @@
                                   <div class="mb-3"><label class="form-label text-muted small fw-bold">เรื่อง</label><input type="text" id="manualEmailSubject" class="form-control" placeholder="รายงานข้อมูลประกันระบบ JMI..."></div>
                                   <div class="mb-3 p-3 bg-light rounded border"><label class="form-label small text-muted fw-bold"><i class="bi bi-layout-three-columns text-primary"></i> เลือกหัวข้อข้อมูลที่ต้องการส่ง</label><div id="manualColumns" class="row g-2 mt-1"></div></div>
                                   <div class="mb-3"><label class="form-label text-muted small fw-bold">ข้อความเพิ่มเติม (ตัวเลือก)</label><textarea id="manualEmailBody" class="form-control" rows="3" placeholder="พิมพ์ข้อความที่ต้องการส่งไปพร้อมกับอีเมล..."></textarea></div>
-                                  <div class="text-end mt-4 pt-3 border-top"><button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ปิด</button><button type="button" class="btn btn-info px-4 text-white me-2" onclick="previewExcel()"><i class="bi bi-file-earmark-excel me-1"></i> ดู Excel ก่อนส่ง</button><button type="button" class="btn btn-primary px-4" onclick="sendManualEmail()"><i class="bi bi-send me-1"></i> ยืนยันส่ง</button></div>
+                                  <div class="text-end mt-4 pt-3 border-top"><button type="button" class="btn btn-secondary me-2 mb-2 mb-md-0" data-bs-dismiss="modal">ปิด</button><button type="button" class="btn btn-info px-3 px-md-4 text-white me-2 mb-2 mb-md-0" onclick="previewExcel()"><i class="bi bi-file-earmark-excel me-1"></i> ดู Excel ก่อนส่ง</button><button type="button" class="btn btn-primary px-3 px-md-4 mb-2 mb-md-0" onclick="sendManualEmail()"><i class="bi bi-send me-1"></i> ยืนยันส่ง</button></div>
                               </div>
                               <div class="tab-pane fade" id="auto-pane" role="tabpanel">
                                   <input type="hidden" id="editAutoSetId" value="">
-                                  <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                                      <h6 class="fw-bold m-0 text-primary" id="autoFormTitle"><i class="bi bi-plus-circle"></i> สร้างการตั้งค่าใหม่</h6>
+                                  <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                      <h6 class="fw-bold m-0 text-primary mb-2 mb-md-0" id="autoFormTitle"><i class="bi bi-plus-circle"></i> สร้างการตั้งค่าใหม่</h6>
                                       <div><button type="button" class="btn btn-sm btn-outline-danger me-2 d-none" id="btnDisableAll" onclick="disableAutoEmail()">ปิดใช้งานทั้งหมด</button><button type="button" class="btn btn-sm btn-outline-secondary d-none" id="btnCancelEdit" onclick="resetAutoForm()">ยกเลิกการแก้ไข</button></div>
                                   </div>
                                   <div class="mb-3"><label class="form-label text-muted small fw-bold">ชื่อเซ็ตการตั้งค่า (ช่วยจำ)</label><input type="text" id="autoSetName" class="form-control" placeholder="เช่น แจ้งเข้าฝ่ายผลิต, เตือนใกล้หมดอายุ..." required></div>
@@ -344,7 +385,7 @@
                               </div>
                           </div>
                       </div>
-                      <div id="autoSettingsSidebar" class="col-lg-4 p-0 bg-light flex-column" style="min-height: 600px; display: none;">
+                      <div id="autoSettingsSidebar" class="col-lg-4 p-0 bg-light flex-column mt-3 mt-lg-0 border-top border-lg-top-0 border-start-0 border-lg-start" style="min-height: 600px; display: none;">
                           <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center"><h6 class="fw-bold text-primary m-0"><i class="bi bi-list-task"></i> รายการตั้งค่าอัตโนมัติ</h6><span class="badge bg-secondary rounded-pill" id="autoSetCountBadge">0 เซ็ต</span></div>
                           <div class="p-3 flex-grow-1" id="savedAutoSetsContainer" style="overflow-y: auto; background-color: #f8f9fa;"><div class="text-center text-muted my-5"><div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div><br><small>กำลังโหลดข้อมูล...</small></div></div>
                       </div>
@@ -362,7 +403,7 @@
                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body p-0">
-                  <div class="table-responsive" style="max-height: 500px;">
+                  <div class="table-responsive" style="max-height: 500px; -webkit-overflow-scrolling: touch;">
                       <table class="table table-hover table-bordered mb-0 text-center align-middle" style="font-size: 0.9rem;">
                           <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">
                               <tr><th width="15%">วัน-เวลาที่ส่ง</th><th width="10%">ประเภท</th><th width="15%">ผู้รับ</th><th width="20%">หัวเรื่อง</th><th width="15%">สถานะข้อมูลที่ส่ง</th><th width="15%">ผลลัพธ์</th><th width="10%">ไฟล์อ้างอิง</th></tr>
@@ -383,14 +424,14 @@
                   <h5 class="modal-title" id="previewExcelModalLabel"><i class="bi bi-file-earmark-excel me-2"></i>ตัวอย่างไฟล์ Excel ก่อนส่ง</h5>
                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="modal-body p-3" id="previewExcelBody" style="background-color: #fff; overflow-x: auto;"></div>
+              <div class="modal-body p-3 p-md-4" id="previewExcelBody" style="background-color: #fff; overflow-x: auto; -webkit-overflow-scrolling: touch;"></div>
               <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button></div>
           </div>
       </div>
   </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxN7SeqS4Xd-U_gLVW5c3wf7femN7InRaB7n5ozDGT1osSWXMTjEqYO7ObuqyilcRtr/exec"; 
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzfbWzy5CiNpvpcOIbU6AaUCwk-auEJUD-3XYNCcpFAhVt9riXjLV-n2e8Saus2W_GN/exec"; 
 
     const google = {
       script: {
@@ -619,13 +660,13 @@
               if (isCurrentUserHR) {
                  document.getElementById("adminSectionTitle").innerHTML = '<i class="bi bi-people-fill me-2"></i>ระบบจัดการสำหรับ ' + currentUserLevel;
                  if(currentUserLevel === 'JMI') {
-                     document.getElementById("hrInstructionText").innerHTML = '<i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียด | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล | เลื่อนตารางซ้าย-ขวาเพื่อดูข้อมูลเพิ่มเติม';
+                     document.getElementById("hrInstructionText").innerHTML = '<i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียด | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล | เลื่อนตารางซ้าย-ขวา/ขึ้น-ลง เพื่อดูข้อมูลเพิ่มเติม';
                      document.getElementById("btnApproveInAll").style.display = "none"; document.getElementById("btnApproveOutAll").style.display = "none"; document.getElementById("btnExportExcel").style.display = "none"; document.getElementById("btnSendEmail").style.display = "none"; document.getElementById("btnEmailHistory").style.display = "none";
                      if(document.getElementById("btnStatusWait")) document.getElementById("btnStatusWait").style.display = "none";
                      if(document.getElementById("btnStatusWaitOut")) document.getElementById("btnStatusWaitOut").style.display = "none";
                      if(document.getElementById("btnStatusExp")) document.getElementById("btnStatusExp").style.display = "none";
                  } else {
-                     document.getElementById("hrInstructionText").innerHTML = '<i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดและจัดการข้อมูล | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล | เลื่อนตารางซ้าย-ขวาเพื่อดูข้อมูลเพิ่มเติม';
+                     document.getElementById("hrInstructionText").innerHTML = '<i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดและจัดการข้อมูล | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล | เลื่อนตารางซ้าย-ขวา/ขึ้น-ลง เพื่อดูข้อมูลเพิ่มเติม';
                      document.getElementById("btnExportExcel").style.display = "inline-block"; document.getElementById("btnEmailHistory").style.display = "inline-block"; document.getElementById("btnSendEmail").style.display = "inline-block"; 
                      if(document.getElementById("btnStatusWait")) document.getElementById("btnStatusWait").style.display = "";
                      if(document.getElementById("btnStatusWaitOut")) document.getElementById("btnStatusWaitOut").style.display = "";
@@ -700,9 +741,9 @@
 
     function filterByStatus(status, btnElement) {
         currentStatusFilter = status;
-        let btns = [ { id: 'btnStatusAll', class: 'btn btn-outline-primary' }, { id: 'btnStatusWait', class: 'btn btn-outline-info text-dark' }, { id: 'btnStatusIn', class: 'btn btn-outline-warning text-dark' }, { id: 'btnStatusWaitOut', class: 'btn btn-outline-danger' }, { id: 'btnStatusOut', class: 'btn btn-outline-dark' }, { id: 'btnStatusExp', class: 'btn btn-outline-secondary' } ];
+        let btns = [ { id: 'btnStatusAll', class: 'btn btn-outline-primary flex-fill' }, { id: 'btnStatusWait', class: 'btn btn-outline-info text-dark flex-fill' }, { id: 'btnStatusIn', class: 'btn btn-outline-warning text-dark flex-fill' }, { id: 'btnStatusWaitOut', class: 'btn btn-outline-danger flex-fill' }, { id: 'btnStatusOut', class: 'btn btn-outline-dark flex-fill' }, { id: 'btnStatusExp', class: 'btn btn-outline-secondary flex-fill' } ];
         btns.forEach(b => { let el = document.getElementById(b.id); if (el) el.className = b.class; });
-        if (status === 'ทั้งหมด') btnElement.className = 'btn btn-primary active'; else if (status === 'รอแจ้งเข้าประกัน') btnElement.className = 'btn btn-info active text-white'; else if (status === 'แจ้งเข้าแล้ว') btnElement.className = 'btn btn-warning active text-dark'; else if (status === 'รอแจ้งออก') btnElement.className = 'btn btn-danger active text-white'; else if (status === 'แจ้งออกแล้ว') btnElement.className = 'btn btn-dark active text-white'; else if (status === 'หมดอายุประกัน') btnElement.className = 'btn btn-secondary active text-white';
+        if (status === 'ทั้งหมด') btnElement.className = 'btn btn-primary active flex-fill'; else if (status === 'รอแจ้งเข้าประกัน') btnElement.className = 'btn btn-info active text-white flex-fill'; else if (status === 'แจ้งเข้าแล้ว') btnElement.className = 'btn btn-warning active text-dark flex-fill'; else if (status === 'รอแจ้งออก') btnElement.className = 'btn btn-danger active text-white flex-fill'; else if (status === 'แจ้งออกแล้ว') btnElement.className = 'btn btn-dark active text-white flex-fill'; else if (status === 'หมดอายุประกัน') btnElement.className = 'btn btn-secondary active text-white flex-fill';
 
         if (currentUserLevel === 'HR') {
             document.getElementById("btnApproveInAll").style.display = (status === 'รอแจ้งเข้าประกัน') ? "inline-block" : "none";
@@ -1189,7 +1230,7 @@
                     '<h6 class="mb-3 text-primary fw-bold"><i class="bi bi-receipt me-2"></i>สถานะการตรวจสอบสลิปโอนเงิน (เฉพาะ HR)</h6>' +
                     '<div class="row g-3 align-items-end">' +
                         '<div class="col-md-6"><select id="editSlipStatus" class="form-select form-select-sm"><option value="" ' + (record.slipStatus === '' ? 'selected' : '') + '>-- รอตรวจสอบ --</option><option value="สลิปโอนเงินถูกต้อง" ' + (record.slipStatus === 'สลิปโอนเงินถูกต้อง' ? 'selected' : '') + '>สลิปโอนเงินถูกต้อง</option><option value="สลิปโอนเงินไม่ถูกต้อง" ' + (record.slipStatus === 'สลิปโอนเงินไม่ถูกต้อง' ? 'selected' : '') + '>สลิปโอนเงินไม่ถูกต้อง</option></select></div>' +
-                        '<div class="col-md-6"><button type="button" class="btn btn-primary btn-sm" onclick="updateSlipStatusOnly(' + record.rowNumber + ', ' + index + ')">สถานะสลิป</button></div>' +
+                        '<div class="col-md-6"><button type="button" class="btn btn-primary btn-sm" onclick="updateSlipStatusOnly(' + record.rowNumber + ', ' + index + ')">อัปเดตสถานะสลิป</button></div>' +
                     '</div></div>';
     
               var cancelSectionStyle = (currentStatusFilter === 'รอแจ้งออก' || currentStatusFilter === 'แจ้งเข้าแล้ว' || record.status === 'แจ้งเข้าแล้ว' || record.status === 'รอแจ้งออก') ? 'block' : 'none';
@@ -1203,12 +1244,12 @@
               
               var approveBtn = '';
               if (record.status === 'รอแจ้งเข้าประกัน') {
-                  if (record.slipStatus === 'สลิปโอนเงินถูกต้อง') approveBtn = '<button type="button" class="btn btn-info text-white me-auto" onclick="approveInsurance(' + record.rowNumber + ')"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งเข้า</button>';
-                  else approveBtn = '<button type="button" class="btn btn-secondary text-white me-auto" onclick="Swal.fire({icon: \'warning\', title: \'ไม่สามารถอนุมัติได้\', text: \'กรุณาตรวจสอบและตั้งค่าสลิปให้ถูกต้องก่อน\'})"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งเข้า</button>';
-              } else if (record.status === 'รอแจ้งออก') { approveBtn = '<button type="button" class="btn btn-danger text-white me-auto" onclick="approveCancelInsurance(' + record.rowNumber + ')"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งออก</button>'; }
-              modalFooter.innerHTML = approveBtn + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button><button type="button" class="btn btn-success" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
+                  if (record.slipStatus === 'สลิปโอนเงินถูกต้อง') approveBtn = '<button type="button" class="btn btn-info text-white me-auto mb-2 mb-md-0" onclick="approveInsurance(' + record.rowNumber + ')"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งเข้า</button>';
+                  else approveBtn = '<button type="button" class="btn btn-secondary text-white me-auto mb-2 mb-md-0" onclick="Swal.fire({icon: \'warning\', title: \'ไม่สามารถอนุมัติได้\', text: \'กรุณาตรวจสอบและตั้งค่าสลิปให้ถูกต้องก่อน\'})"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งเข้า</button>';
+              } else if (record.status === 'รอแจ้งออก') { approveBtn = '<button type="button" class="btn btn-danger text-white me-auto mb-2 mb-md-0" onclick="approveCancelInsurance(' + record.rowNumber + ')"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งออก</button>'; }
+              modalFooter.innerHTML = approveBtn + '<button type="button" class="btn btn-secondary mb-2 mb-md-0" data-bs-dismiss="modal">ปิดหน้าต่าง</button><button type="button" class="btn btn-success mb-2 mb-md-0" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
           } else {
-              modalFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button><button type="button" class="btn btn-success" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
+              modalFooter.innerHTML = '<button type="button" class="btn btn-secondary mb-2 mb-md-0" data-bs-dismiss="modal">ปิดหน้าต่าง</button><button type="button" class="btn btn-success mb-2 mb-md-0" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
           }
       } else {
           html += `<div class="row g-3 mb-3">
@@ -1230,10 +1271,10 @@
           
           html += docsHtml;
           
-          var empBtns = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>';
+          var empBtns = '<button type="button" class="btn btn-secondary mb-2 mb-md-0" data-bs-dismiss="modal">ปิดหน้าต่าง</button>';
           if (hasMissingDocs) {
-              empBtns += '<button type="button" id="btnEditEmpDocs" class="btn btn-warning" onclick="enableEmpDocEdit()"><i class="bi bi-pencil-square me-1"></i> แก้ไขเอกสาร</button>';
-              empBtns += '<button type="button" id="btnSaveEmpDocs" class="btn btn-success" style="display:none;" onclick="saveEmpDocs()"><i class="bi bi-save me-1"></i> บันทึกข้อมูล</button>';
+              empBtns += '<button type="button" id="btnEditEmpDocs" class="btn btn-warning mb-2 mb-md-0" onclick="enableEmpDocEdit()"><i class="bi bi-pencil-square me-1"></i> แก้ไขเอกสาร</button>';
+              empBtns += '<button type="button" id="btnSaveEmpDocs" class="btn btn-success mb-2 mb-md-0" style="display:none;" onclick="saveEmpDocs()"><i class="bi bi-save me-1"></i> บันทึกข้อมูล</button>';
           }
           modalFooter.innerHTML = empBtns;
       }
