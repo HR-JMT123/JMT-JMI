@@ -237,69 +237,118 @@
 </div>
 
 <div class="glass-card hr-card" id="hrSection">
-    <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-4 mt-2">
-       <div class="section-title border-bottom-0 mb-0 mt-0" id="adminSectionTitle"><i class="bi bi-people-fill me-2"></i>ระบบจัดการสำหรับ HR</div>
-       <div class="d-flex flex-wrap align-items-center gap-2 mt-2 mt-md-0" id="hrButtonsContainer">
-           <span class="badge bg-primary rounded-pill px-3 py-2" id="hrTotalCount">รวม 0 รายการ</span>
-           <button type="button" id="btnApproveInAll" class="btn btn-sm btn-info text-white rounded-pill px-3" style="display:none;" onclick="approveAllInsuranceIn()" title="เลือกอนุมัติรอแจ้งเข้าที่มีสลิปถูกต้อง"><i class="bi bi-check-all me-1"></i>อนุมัติแจ้งเข้า All</button>
-           <button type="button" id="btnCancelSelectIn" class="btn btn-sm btn-secondary text-white rounded-pill px-3" style="display:none;" onclick="cancelSelectModeIn()">ยกเลิก</button>
-           <button type="button" id="btnApproveOutAll" class="btn btn-sm btn-danger text-white rounded-pill px-3" style="display:none;" onclick="approveAllInsuranceOut()" title="เลือกอนุมัติรอแจ้งออกทั้งหมด"><i class="bi bi-check-all me-1"></i>อนุมัติแจ้งออก All</button>
-           <button type="button" id="btnCancelSelectOut" class="btn btn-sm btn-secondary text-white rounded-pill px-3" style="display:none;" onclick="cancelSelectModeOut()">ยกเลิก</button>
-           <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="fetchHRTableData()" title="รีเฟรชข้อมูล"><i class="bi bi-arrow-clockwise me-1"></i>รีเฟรช</button>
-           <button type="button" id="btnSendEmail" class="btn btn-sm btn-primary rounded-pill px-3" onclick="openEmailModal()" title="ตั้งค่า/ส่งรายงานผ่าน Email"><i class="bi bi-envelope-fill me-1"></i>ส่ง/ตั้งค่า Email</button>
-           <button type="button" id="btnEmailHistory" class="btn btn-sm btn-info text-white rounded-pill px-3" style="display:none;" onclick="openEmailHistoryModal()" title="ประวัติการส่งอีเมล"><i class="bi bi-clock-history me-1"></i>ประวัติอีเมล</button>
-           <button type="button" id="btnExportExcel" class="btn btn-sm btn-success rounded-pill px-3" onclick="exportExcel()"><i class="bi bi-file-earmark-excel me-1"></i>Export Excel</button>
-           <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="logoutSystem()"><i class="bi bi-box-arrow-right me-1"></i>ออก</button>
-       </div>
-    </div>
     
-    <div class="row mb-3 align-items-end g-3">
-        <div class="col-lg-6 col-md-12">
-            <label class="small text-muted mb-1 d-block"><i class="bi bi-funnel"></i> ตัวกรองสถานะ:</label>
-            <div class="d-flex flex-wrap w-100 gap-1" id="statusFilterGroup" role="group">
-              <button type="button" class="btn btn-primary active flex-fill" id="btnStatusAll" onclick="filterByStatus('ทั้งหมด', this)">ทั้งหมด</button>
-              <button type="button" class="btn btn-outline-info text-dark flex-fill" id="btnStatusWait" onclick="filterByStatus('รอแจ้งเข้าประกัน', this)">รอแจ้งเข้า</button>
-              <button type="button" class="btn btn-outline-warning text-dark flex-fill" id="btnStatusIn" onclick="filterByStatus('แจ้งเข้าแล้ว', this)">แจ้งเข้าแล้ว</button>
-              <button type="button" class="btn btn-outline-danger flex-fill" id="btnStatusWaitOut" onclick="filterByStatus('รอแจ้งออก', this)">รอแจ้งออก</button>
-              <button type="button" class="btn btn-outline-dark flex-fill" id="btnStatusOut" onclick="filterByStatus('แจ้งออกแล้ว', this)">แจ้งออกแล้ว</button>
-              <button type="button" class="btn btn-outline-secondary flex-fill" id="btnStatusExp" onclick="filterByStatus('หมดอายุประกัน', this)">หมดอายุ</button>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+       <div class="section-title border-bottom-0 mb-0 mt-0" id="adminSectionTitle"><i class="bi bi-people-fill me-2"></i>ระบบจัดการสำหรับ HR</div>
+       <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="logoutSystem()"><i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ</button>
+    </div>
+
+    <div class="d-flex mb-4 gap-2 border-bottom pb-2 overflow-auto" style="-webkit-overflow-scrolling: touch; white-space: nowrap;">
+        <button class="btn btn-primary px-4 py-2 fw-bold shadow-sm" id="btnTabInsurance" onclick="switchHRTab('insurance')"><i class="bi bi-shield-check me-2"></i>ระบบจัดการซื้อประกัน</button>
+        <button class="btn btn-outline-primary px-4 py-2 fw-bold" id="btnTabDataLogin" onclick="switchHRTab('datalogin')"><i class="bi bi-person-lines-fill me-2"></i>จัดการ Data Login</button>
+    </div>
+
+    <div id="pane-insurance">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 border-bottom pb-3">
+            <span class="badge bg-primary rounded-pill px-3 py-2" id="hrTotalCount">รวม 0 รายการ</span>
+            <div class="d-flex flex-wrap gap-2">
+               <button type="button" id="btnApproveInAll" class="btn btn-sm btn-info text-white rounded-pill px-3" style="display:none;" onclick="approveAllInsuranceIn()" title="เลือกอนุมัติรอแจ้งเข้าที่มีสลิปถูกต้อง"><i class="bi bi-check-all me-1"></i>อนุมัติแจ้งเข้า All</button>
+               <button type="button" id="btnCancelSelectIn" class="btn btn-sm btn-secondary text-white rounded-pill px-3" style="display:none;" onclick="cancelSelectModeIn()">ยกเลิก</button>
+               <button type="button" id="btnApproveOutAll" class="btn btn-sm btn-danger text-white rounded-pill px-3" style="display:none;" onclick="approveAllInsuranceOut()" title="เลือกอนุมัติรอแจ้งออกทั้งหมด"><i class="bi bi-check-all me-1"></i>อนุมัติแจ้งออก All</button>
+               <button type="button" id="btnCancelSelectOut" class="btn btn-sm btn-secondary text-white rounded-pill px-3" style="display:none;" onclick="cancelSelectModeOut()">ยกเลิก</button>
+               <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="fetchHRTableData()" title="รีเฟรชข้อมูล"><i class="bi bi-arrow-clockwise me-1"></i>รีเฟรช</button>
+               <button type="button" id="btnSendEmail" class="btn btn-sm btn-primary rounded-pill px-3" onclick="openEmailModal()" title="ตั้งค่า/ส่งรายงานผ่าน Email"><i class="bi bi-envelope-fill me-1"></i>ส่ง/ตั้งค่า Email</button>
+               <button type="button" id="btnEmailHistory" class="btn btn-sm btn-info text-white rounded-pill px-3" style="display:none;" onclick="openEmailHistoryModal()" title="ประวัติการส่งอีเมล"><i class="bi bi-clock-history me-1"></i>ประวัติอีเมล</button>
+               <button type="button" id="btnExportExcel" class="btn btn-sm btn-success rounded-pill px-3" onclick="exportExcel()"><i class="bi bi-file-earmark-excel me-1"></i>Export Excel</button>
             </div>
         </div>
-        <div class="col-lg-6 col-md-12 text-lg-end text-start mt-3 mt-lg-0">
-            <div class="d-flex flex-wrap align-items-center justify-content-lg-end gap-2 mb-1">
-                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="clearAllFilters()" title="เคลียร์ตัวกรอง" style="font-size: 0.8rem;"><i class="bi bi-eraser me-1"></i>เคลียร์</button>
-                <div class="d-inline-flex align-items-center gap-1">
-                    <i class="bi bi-calendar-range text-muted"></i>
-                    <select id="dateFilterType" class="form-select form-select-sm border-0 shadow-none p-0 text-muted small fw-bold" style="width: auto; cursor: pointer; padding-left: 0 !important;" onchange="applyAllFilters()"><option value="0">กรองจาก วันที่บันทึก:</option><option value="3">กรองจาก เริ่มคุ้มครอง:</option><option value="4">กรองจาก สิ้นสุดคุ้มครอง:</option><option value="7">กรองจาก วันที่ออกประกัน:</option></select>
+        
+        <div class="row mb-3 align-items-end g-3">
+            <div class="col-lg-6 col-md-12">
+                <label class="small text-muted mb-1 d-block"><i class="bi bi-funnel"></i> ตัวกรองสถานะ:</label>
+                <div class="d-flex flex-wrap w-100 gap-1" id="statusFilterGroup" role="group">
+                  <button type="button" class="btn btn-primary active flex-fill" id="btnStatusAll" onclick="filterByStatus('ทั้งหมด', this)">ทั้งหมด</button>
+                  <button type="button" class="btn btn-outline-info text-dark flex-fill" id="btnStatusWait" onclick="filterByStatus('รอแจ้งเข้าประกัน', this)">รอแจ้งเข้า</button>
+                  <button type="button" class="btn btn-outline-warning text-dark flex-fill" id="btnStatusIn" onclick="filterByStatus('แจ้งเข้าแล้ว', this)">แจ้งเข้าแล้ว</button>
+                  <button type="button" class="btn btn-outline-danger flex-fill" id="btnStatusWaitOut" onclick="filterByStatus('รอแจ้งออก', this)">รอแจ้งออก</button>
+                  <button type="button" class="btn btn-outline-dark flex-fill" id="btnStatusOut" onclick="filterByStatus('แจ้งออกแล้ว', this)">แจ้งออกแล้ว</button>
+                  <button type="button" class="btn btn-outline-secondary flex-fill" id="btnStatusExp" onclick="filterByStatus('หมดอายุประกัน', this)">หมดอายุ</button>
                 </div>
             </div>
-            <div class="d-flex justify-content-lg-end align-items-center gap-2">
-                <input type="date" id="dateStart" class="form-control form-control-sm flex-fill" style="max-width: 150px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
-                <span class="text-muted">-</span>
-                <input type="date" id="dateEnd" class="form-control form-control-sm flex-fill" style="max-width: 150px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
+            <div class="col-lg-6 col-md-12 text-lg-end text-start mt-3 mt-lg-0">
+                <div class="d-flex flex-wrap align-items-center justify-content-lg-end gap-2 mb-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="clearAllFilters()" title="เคลียร์ตัวกรอง" style="font-size: 0.8rem;"><i class="bi bi-eraser me-1"></i>เคลียร์</button>
+                    <div class="d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-calendar-range text-muted"></i>
+                        <select id="dateFilterType" class="form-select form-select-sm border-0 shadow-none p-0 text-muted small fw-bold" style="width: auto; cursor: pointer; padding-left: 0 !important;" onchange="applyAllFilters()"><option value="0">กรองจาก วันที่บันทึก:</option><option value="3">กรองจาก เริ่มคุ้มครอง:</option><option value="4">กรองจาก สิ้นสุดคุ้มครอง:</option><option value="7">กรองจาก วันที่ออกประกัน:</option></select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-lg-end align-items-center gap-2">
+                    <input type="date" id="dateStart" class="form-control form-control-sm flex-fill" style="max-width: 150px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
+                    <span class="text-muted">-</span>
+                    <input type="date" id="dateEnd" class="form-control form-control-sm flex-fill" style="max-width: 150px; font-size: 0.8rem; padding: 4px 8px;" onchange="applyAllFilters()">
+                </div>
             </div>
+        </div>
+
+        <p class="text-muted small mb-2" id="hrInstructionText"><i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดและจัดการสถานะการแจ้งออก | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล | เลื่อนตารางซ้าย-ขวา/ขึ้น-ลง เพื่อดูข้อมูลเพิ่มเติม</p>
+        <div class="custom-table-container shadow-sm">
+          <table class="table custom-table table-bordered align-middle text-center mb-0" id="hrTable">
+            <thead>
+              <tr>
+                <th width="14%" id="thTimestamp"><div class="date-cell-wrapper"><input type="checkbox" id="selectAllMain" class="form-check-input" onchange="toggleSelectAllMain(this)"> วันที่บันทึก</div></th>
+                <th width="9%">รหัสพนักงาน<br><input type="text" class="form-control form-control-sm col-filter" data-col="1" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
+                <th width="12%">ชื่อ-นามสกุล<br><input type="text" class="form-control form-control-sm col-filter" data-col="2" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
+                <th width="10%">เริ่มคุ้มครอง</th>
+                <th width="10%">สิ้นสุดคุ้มครอง</th>
+                <th width="10%">วันคงเหลือ <i class="bi bi-sort-numeric-down ms-1" id="sortIconHR" style="cursor:pointer;" onclick="sortHRTable()" title="เรียงลำดับ"></i><br><input type="text" class="form-control form-control-sm col-filter" data-col="5" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
+                <th width="10%">สถานะ</th>
+                <th width="10%">วันที่ออกประกัน</th>
+                <th width="15%">เอกสาร<br><select class="form-select form-select-sm col-filter" data-col="8" onchange="applyAllFilters()"><option value="">ทั้งหมด</option><option value="ข้อมูลครบถ้วน">ข้อมูลครบถ้วน</option><option value="ข้อมูลไม่ครบ">ข้อมูลไม่ครบ</option><option value="สลิปโอนเงินถูกต้อง">สลิปถูกต้อง</option><option value="สลิปโอนเงินไม่ถูกต้อง">สลิปไม่ถูกต้อง</option></select></th>
+              </tr>
+            </thead>
+            <tbody id="hrTableBody"></tbody>
+          </table>
         </div>
     </div>
 
-    <p class="text-muted small mb-2" id="hrInstructionText"><i class="bi bi-hand-index-thumb text-primary me-1"></i> กดที่แถวเพื่อดูรายละเอียดและจัดการสถานะการแจ้งออก | พิมพ์ค้นหาในช่องใต้หัวข้อเพื่อกรองข้อมูล | เลื่อนตารางซ้าย-ขวา/ขึ้น-ลง เพื่อดูข้อมูลเพิ่มเติม</p>
-    <div class="custom-table-container shadow-sm">
-      <table class="table custom-table table-bordered align-middle text-center mb-0" id="hrTable">
-        <thead>
-          <tr>
-            <th width="14%" id="thTimestamp"><div class="date-cell-wrapper"><input type="checkbox" id="selectAllMain" class="form-check-input" onchange="toggleSelectAllMain(this)"> วันที่บันทึก</div></th>
-            <th width="9%">รหัสพนักงาน<br><input type="text" class="form-control form-control-sm col-filter" data-col="1" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
-            <th width="12%">ชื่อ-นามสกุล<br><input type="text" class="form-control form-control-sm col-filter" data-col="2" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
-            <th width="10%">เริ่มคุ้มครอง</th>
-            <th width="10%">สิ้นสุดคุ้มครอง</th>
-            <th width="10%">วันคงเหลือ <i class="bi bi-sort-numeric-down ms-1" id="sortIconHR" style="cursor:pointer;" onclick="sortHRTable()" title="เรียงลำดับ"></i><br><input type="text" class="form-control form-control-sm col-filter" data-col="5" placeholder="ค้นหา..." onkeyup="applyAllFilters()"></th>
-            <th width="10%">สถานะ</th>
-            <th width="10%">วันที่ออกประกัน</th>
-            <th width="15%">เอกสาร<br><select class="form-select form-select-sm col-filter" data-col="8" onchange="applyAllFilters()"><option value="">ทั้งหมด</option><option value="ข้อมูลครบถ้วน">ข้อมูลครบถ้วน</option><option value="ข้อมูลไม่ครบ">ข้อมูลไม่ครบ</option><option value="สลิปโอนเงินถูกต้อง">สลิปถูกต้อง</option><option value="สลิปโอนเงินไม่ถูกต้อง">สลิปไม่ถูกต้อง</option></select></th>
-          </tr>
-        </thead>
-        <tbody id="hrTableBody"></tbody>
-      </table>
+    <div id="pane-datalogin" style="display:none;">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 border-bottom pb-3">
+            <span class="badge bg-secondary rounded-pill px-3 py-2" id="dataLoginTotalCount">รวม 0 รายการ</span>
+            <div class="d-flex flex-wrap gap-2">
+                <div class="input-group input-group-sm" style="max-width: 250px;">
+                   <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                   <input type="text" id="searchDataLogin" class="form-control border-start-0" placeholder="ค้นหาข้อมูล (พิมพ์เลย)..." onkeyup="filterDataLogin()">
+                </div>
+               <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="fetchDataLoginRecords()" title="รีเฟรชข้อมูล"><i class="bi bi-arrow-clockwise me-1"></i>รีเฟรช</button>
+               <button class="btn btn-sm btn-success rounded-pill px-3" onclick="exportDataLoginExcel()"><i class="bi bi-file-earmark-excel me-1"></i>Export Excel</button>
+               <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="openDataLoginModal()"><i class="bi bi-plus-circle me-1"></i>เพิ่มข้อมูล</button>
+            </div>
+        </div>
+        
+        <p class="text-muted small mb-2"><i class="bi bi-hand-index-thumb text-primary me-1"></i> ข้อมูลพื้นฐานและสิทธิ์การเข้าสู่ระบบ (สถานะ Insurance จะอัปเดตอิงตามข้อมูลหน้าซื้อประกันอัตโนมัติ)</p>
+        <div class="custom-table-container shadow-sm">
+            <table class="table custom-table table-bordered align-middle text-center mb-0">
+                <thead>
+                    <tr>
+                        <th>จัดการ</th>
+                        <th>ID Card</th>
+                        <th>Emp ID</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Department</th>
+                        <th>Company</th>
+                        <th>Level</th>
+                        <th>Insurance Status</th>
+                        <th>Employee Status</th>
+                        <th>เอกสาร</th>
+                    </tr>
+                </thead>
+                <tbody id="dataLoginTableBody"></tbody>
+            </table>
+        </div>
     </div>
+
 </div>
 
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
@@ -315,6 +364,66 @@
         </div>
       </div>
     </div>
+</div>
+
+<div class="modal fade" id="dataLoginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="dataLoginModalLabel"><i class="bi bi-person-lines-fill me-2"></i>เพิ่ม/แก้ไข ข้อมูลพนักงาน</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-3 p-md-4">
+          <form id="dataLoginForm" onsubmit="event.preventDefault(); submitDataLogin();">
+             <input type="hidden" id="dlRowNumber">
+             <div class="row g-3">
+                 <div class="col-md-6"><label class="form-label small text-muted mb-1">ID Card <span class="text-danger">*</span></label><input type="text" id="dlIdCard" class="form-control form-control-sm" required></div>
+                 <div class="col-md-6"><label class="form-label small text-muted mb-1">Employee ID <span class="text-danger">*</span></label><input type="text" id="dlEmpId" class="form-control form-control-sm" required></div>
+                 <div class="col-md-12"><label class="form-label small text-muted mb-1">Name <span class="text-danger">*</span></label><input type="text" id="dlName" class="form-control form-control-sm" required></div>
+                 <div class="col-md-6"><label class="form-label small text-muted mb-1">Position</label><input type="text" id="dlPosition" class="form-control form-control-sm"></div>
+                 <div class="col-md-6"><label class="form-label small text-muted mb-1">Department</label><input type="text" id="dlDept" class="form-control form-control-sm"></div>
+                 <div class="col-md-4"><label class="form-label small text-muted mb-1">Company</label><input type="text" id="dlComp" class="form-control form-control-sm"></div>
+                 <div class="col-md-4"><label class="form-label small text-muted mb-1">Level</label><input type="text" id="dlLevel" class="form-control form-control-sm"></div>
+                 <div class="col-md-4"><label class="form-label small text-muted mb-1">DOB (วันเกิด)</label><input type="date" id="dlDob" class="form-control form-control-sm"></div>
+                 <div class="col-md-4"><label class="form-label small text-muted mb-1">Tel</label><input type="text" id="dlTel" class="form-control form-control-sm" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');"></div>
+                 <div class="col-md-4"><label class="form-label small text-muted mb-1">Branch</label><input type="text" id="dlBranch" class="form-control form-control-sm"></div>
+                 <div class="col-md-4"><label class="form-label small text-muted mb-1">Start Date</label><input type="date" id="dlStart" class="form-control form-control-sm"></div>
+                 <div class="col-12"><label class="form-label small text-muted mb-1">Address</label><textarea id="dlAddr" class="form-control form-control-sm" rows="2"></textarea></div>
+                 
+                 <div class="col-12 border-top pt-3 mt-4"><h6 class="text-primary fw-bold"><i class="bi bi-gear-fill me-2"></i>ตั้งค่าสถานะ (Status)</h6></div>
+                 <div class="col-md-6">
+                     <label class="form-label small fw-bold text-dark mb-1">Insurance Status</label>
+                     <select id="dlInsStatus" class="form-select form-select-sm border-secondary">
+                         <option value="รอดำเนินการ">รอดำเนินการ</option>
+                         <option value="ซื้อค้ำประกัน">ซื้อค้ำประกัน</option>
+                         <option value="มีค้ำประกัน">มีค้ำประกัน</option>
+                     </select>
+                     <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">*ระบบจะอัปเดตเป็น ซื้อค้ำอัตโนมัติ หากเจอในหน้าซื้อประกัน</small>
+                 </div>
+                 <div class="col-md-6">
+                     <label class="form-label small fw-bold text-danger mb-1">Employee Status <span class="text-danger">*</span></label>
+                     <select id="dlEmpStatus" class="form-select form-select-sm border-danger" required>
+                         <option value="ทำงาน">ทำงาน</option>
+                         <option value="ลาออก">ลาออก</option>
+                     </select>
+                     <small class="text-danger d-block mt-1" style="font-size: 0.7rem;">*หากตั้งเป็น "ลาออก" จะไม่สามารถ Login ได้</small>
+                 </div>
+                 
+                 <div class="col-12 mt-3">
+                     <label class="form-label small text-muted mb-1">แนบไฟล์เอกสารพนักงานเพิ่มเติม (ถ้ามี)</label>
+                     <input type="file" id="dlDoc" name="newDoc" class="form-control form-control-sm" accept="image/*,application/pdf">
+                     <input type="hidden" id="dlDocUrl">
+                     <div id="dlDocPreview" class="mt-2 text-start"></div>
+                 </div>
+             </div>
+             <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                 <button type="submit" class="btn btn-primary" id="btnSaveDataLogin"><i class="bi bi-save me-1"></i> บันทึกข้อมูล</button>
+             </div>
+          </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
@@ -431,7 +540,7 @@
   </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzfbWzy5CiNpvpcOIbU6AaUCwk-auEJUD-3XYNCcpFAhVt9riXjLV-n2e8Saus2W_GN/exec"; 
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyT5nOsTAbOzqx6LWqQZ3jCxVOUCfgH8dBptof6WkQ6kyP8yWpmCiw92BCY12_kE65C/exec"; 
 
     const google = {
       script: {
@@ -508,6 +617,7 @@
 
     var currentUserLevel = '';
     var currentRecords = [];
+    var dataLoginRecords = [];
     var currentStatusFilter = 'ทั้งหมด'; 
     var isCurrentUserHR = false; 
 
@@ -625,13 +735,28 @@
         let icon = document.getElementById("sortIconUser"); if(icon) icon.className = sortDirUser === 1 ? "bi bi-sort-numeric-down ms-1" : "bi bi-sort-numeric-up ms-1"; sortDirUser *= -1; rows.forEach(row => tbody.appendChild(row));
     }
 
+    function switchHRTab(tab) {
+        if(tab === 'insurance') {
+            document.getElementById('pane-insurance').style.display = 'block';
+            document.getElementById('pane-datalogin').style.display = 'none';
+            document.getElementById('btnTabInsurance').classList.replace('btn-outline-primary', 'btn-primary');
+            document.getElementById('btnTabDataLogin').classList.replace('btn-primary', 'btn-outline-primary');
+        } else {
+            document.getElementById('pane-insurance').style.display = 'none';
+            document.getElementById('pane-datalogin').style.display = 'block';
+            document.getElementById('btnTabInsurance').classList.replace('btn-primary', 'btn-outline-primary');
+            document.getElementById('btnTabDataLogin').classList.replace('btn-outline-primary', 'btn-primary');
+            if(dataLoginRecords.length === 0) fetchDataLoginRecords();
+        }
+    }
+
     function logoutSystem() {
         try { localStorage.removeItem('jmi_login_id'); } catch(e) {}
         document.getElementById("tableSection").style.display = "none"; document.getElementById("hrSection").style.display = "none"; document.getElementById("loginSection").style.display = "block"; document.getElementById("loginIdCard").value = ""; document.getElementById("myForm").reset();
         ["dob", "tel", "address", "branch"].forEach(id => { let el = document.getElementById(id); if(el) { el.readOnly = false; el.classList.remove("readonly-field"); } });
         ["reqForm", "slip", "slip2", "idCopy", "bankBook", "otherDoc"].forEach(id => { let el = document.getElementById(id); if(el) { el.disabled = false; } });
         let submitBtn = document.getElementById("submitBtn"); if(submitBtn) { submitBtn.disabled = false; submitBtn.style.display = 'block'; }
-        currentRecords = []; currentUserLevel = ''; window.scrollTo({ top: 0, behavior: 'smooth' });
+        currentRecords = []; dataLoginRecords = []; currentUserLevel = ''; window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function handleLogin(isAutoLogin = false) {
@@ -674,7 +799,7 @@
                  }
                  document.getElementById("dateStart").value = ""; document.getElementById("dateEnd").value = ""; document.getElementById("dateFilterType").value = "0"; document.querySelectorAll('.col-filter').forEach(inp => inp.value = "");
                  filterByStatus('ทั้งหมด', document.getElementById('btnStatusAll'));
-                 document.getElementById("hrSection").style.display = "block"; fetchHRTableData();
+                 document.getElementById("hrSection").style.display = "block"; switchHRTab('insurance'); fetchHRTableData();
               } else {
                  document.getElementById("tableSection").style.display = "block"; 
                  document.getElementById("btnShowForm").style.display = "inline-block"; 
@@ -695,8 +820,9 @@
         } else {
           document.getElementById("initLoader").style.display = "none";
           document.getElementById("loginSection").style.display = "block";
-          if(isAutoLogin) Swal.fire({ icon: 'warning', title: 'เซสชันหมดอายุ', text: 'กรุณาเข้าสู่ระบบใหม่' });
-          else Swal.fire({ icon: 'error', title: 'ไม่พบข้อมูล', text: 'ไม่มี ID Card นี้ในระบบ กรุณาตรวจสอบอีกครั้ง', confirmButtonColor: '#4e54c8' });
+          var msg = result.msg || 'ไม่มี ID Card นี้ในระบบ กรุณาตรวจสอบอีกครั้ง';
+          if(isAutoLogin) Swal.fire({ icon: 'warning', title: 'เซสชันหมดอายุหรือไม่ถูกต้อง', text: msg });
+          else Swal.fire({ icon: 'error', title: 'ไม่พบข้อมูล/ถูกระงับ', text: msg, confirmButtonColor: '#4e54c8' });
           try { localStorage.removeItem('jmi_login_id'); } catch(e) {}
         }
       }).checkLogin(idCardInput);
@@ -885,6 +1011,205 @@
         document.querySelectorAll('.main-chk').forEach(cb => { cb.style.display = "inline-block"; cb.checked = false; }); document.querySelectorAll('.select-out-chk').forEach(cb => { cb.style.display = "none"; cb.checked = false; });
     }
     function toggleSelectAllOut(source) { let eligibleCheckboxes = document.querySelectorAll('.select-out-chk'); let visibleEligible = Array.from(eligibleCheckboxes).filter(cb => cb.closest('tr').style.display !== 'none'); visibleEligible.forEach(cb => cb.checked = source.checked); }
+
+    // ============================================
+    // ส่วนเสริมสำหรับจัดการหน้าต่าง Data Login (สิทธิ์ HR)
+    // ============================================
+    function fetchDataLoginRecords() {
+        var tbody = document.getElementById("dataLoginTableBody");
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><br><small class="text-muted mt-2 d-block">กำลังโหลดฐานข้อมูลพนักงาน...</small></td></tr>';
+        google.script.run.withSuccessHandler(function(data) {
+            dataLoginRecords = data;
+            renderDataLoginTable(data);
+        }).getDataLoginRecords();
+    }
+
+    function renderDataLoginTable(dataList) {
+        var tbody = document.getElementById("dataLoginTableBody");
+        tbody.innerHTML = "";
+        document.getElementById("dataLoginTotalCount").innerText = "รวม " + dataList.length + " รายการ";
+        if(dataList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-3">ไม่มีข้อมูลในฐานระบบ</td></tr>'; return;
+        }
+        dataList.forEach((r, idx) => {
+            var eStatusClass = r.empStatus === 'ทำงาน' ? 'text-success' : 'text-danger';
+            var iStatusClass = (r.insuranceStatus === 'ซื้อค้ำประกัน' || r.insuranceStatus === 'มีค้ำประกัน') ? 'text-success' : 'text-warning';
+            var docBtn = r.docUrl ? `<button class="btn btn-sm btn-outline-info" onclick="viewDocument('${r.docUrl}')" title="ดูเอกสาร"><i class="bi bi-file-earmark-text"></i></button>` : `<span class="text-muted small">-</span>`;
+            
+            var tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>
+                    <button class="btn btn-sm btn-warning text-dark me-1" onclick="openDataLoginModal(${idx})" title="แก้ไข"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteDataLogin(${r.rowNumber})" title="ลบ"><i class="bi bi-trash"></i></button>
+                </td>
+                <td style="mso-number-format:'\\@';">${r.idCard}</td>
+                <td style="mso-number-format:'\\@';">${r.empId}</td>
+                <td class="text-start">${r.name}</td>
+                <td>${r.position}</td>
+                <td>${r.department}</td>
+                <td>${r.company}</td>
+                <td>${r.level}</td>
+                <td><strong class="${iStatusClass}">${r.insuranceStatus}</strong></td>
+                <td><strong class="${eStatusClass}">${r.empStatus}</strong></td>
+                <td>${docBtn}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function filterDataLogin() {
+        var input = document.getElementById("searchDataLogin").value.toUpperCase();
+        var filteredData = dataLoginRecords.filter(r => {
+            return Object.values(r).some(val => val && val.toString().toUpperCase().indexOf(input) > -1);
+        });
+        renderDataLoginTable(filteredData);
+    }
+
+    function exportDataLoginExcel() {
+        if (dataLoginRecords.length === 0) { Swal.fire({icon: 'info', title: 'ไม่มีข้อมูล', text: 'ไม่มีข้อมูล Data Login สำหรับ Export'}); return; }
+        
+        let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1" style="border-collapse: collapse;"><thead><tr style="background-color: #6c757d; color: #ffffff; font-weight: bold;"><th>ID Card</th><th>Employee ID</th><th>Name</th><th>Position</th><th>Department</th><th>Company</th><th>Level</th><th>DOB</th><th>Tel</th><th>Address</th><th>Branch</th><th>Start Date</th><th>Insurance Status</th><th>Employee Status</th><th>Document URL</th></tr></thead><tbody>`;
+        
+        var input = document.getElementById("searchDataLogin").value.toUpperCase();
+        var exportData = dataLoginRecords;
+        if(input) { exportData = dataLoginRecords.filter(r => Object.values(r).some(val => val && val.toString().toUpperCase().indexOf(input) > -1)); }
+
+        exportData.forEach(r => { 
+            tableHtml += `<tr><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.idCard || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.empId || '-'}</td><td style="border: 1px solid #000;">${r.name || '-'}</td><td style="border: 1px solid #000;">${r.position || '-'}</td><td style="border: 1px solid #000;">${r.department || '-'}</td><td style="border: 1px solid #000;">${r.company || '-'}</td><td style="border: 1px solid #000;">${r.level || '-'}</td><td style="border: 1px solid #000;">${r.dob || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.tel || '-'}</td><td style="border: 1px solid #000;">${r.address || '-'}</td><td style="border: 1px solid #000;">${r.branch || '-'}</td><td style="border: 1px solid #000;">${r.startDate || '-'}</td><td style="border: 1px solid #000;">${r.insuranceStatus || '-'}</td><td style="border: 1px solid #000;">${r.empStatus || '-'}</td><td style="border: 1px solid #000;">${r.docUrl || '-'}</td></tr>`; 
+        });
+        tableHtml += `</tbody></table></body></html>`;
+
+        var blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' }); var url = URL.createObjectURL(blob); var a = document.createElement("a"); a.href = url; a.download = 'Data_Login_' + new Date().getTime() + '.xls'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+
+    function openDataLoginModal(index) {
+        document.getElementById("dataLoginForm").reset();
+        document.getElementById("dlDocPreview").innerHTML = "";
+        document.getElementById("dlDocUrl").value = "";
+        
+        if (index !== undefined && index !== null) {
+            document.getElementById("dataLoginModalLabel").innerHTML = '<i class="bi bi-pencil-square me-2"></i>แก้ไขข้อมูลพนักงาน';
+            var r = dataLoginRecords[index];
+            document.getElementById("dlRowNumber").value = r.rowNumber;
+            document.getElementById("dlIdCard").value = r.idCard;
+            document.getElementById("dlEmpId").value = r.empId;
+            document.getElementById("dlName").value = r.name;
+            document.getElementById("dlPosition").value = r.position;
+            document.getElementById("dlDept").value = r.department;
+            document.getElementById("dlComp").value = r.company;
+            document.getElementById("dlLevel").value = r.level;
+            document.getElementById("dlDob").value = r.dob;
+            document.getElementById("dlTel").value = r.tel;
+            document.getElementById("dlAddr").value = r.address;
+            document.getElementById("dlBranch").value = r.branch;
+            document.getElementById("dlStart").value = r.startDate;
+            document.getElementById("dlInsStatus").value = r.insuranceStatus;
+            document.getElementById("dlEmpStatus").value = r.empStatus;
+            if(r.docUrl) {
+                document.getElementById("dlDocUrl").value = r.docUrl;
+                document.getElementById("dlDocPreview").innerHTML = `<a href="${r.docUrl}" target="_blank" class="badge bg-info text-dark text-decoration-none"><i class="bi bi-file-earmark-text"></i> ดูเอกสารที่มีอยู่แล้ว</a>`;
+            }
+        } else {
+            document.getElementById("dataLoginModalLabel").innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>เพิ่มข้อมูลพนักงานใหม่';
+            document.getElementById("dlRowNumber").value = "";
+            document.getElementById("dlInsStatus").value = "รอดำเนินการ";
+            document.getElementById("dlEmpStatus").value = "ทำงาน";
+        }
+        var modal = new bootstrap.Modal(document.getElementById('dataLoginModal'));
+        modal.show();
+    }
+
+    function submitDataLogin() {
+        var btn = document.getElementById("btnSaveDataLogin");
+        var originalHtml = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังบันทึก...';
+        btn.disabled = true;
+
+        var formData = {
+            rowNumber: document.getElementById("dlRowNumber").value,
+            idCard: document.getElementById("dlIdCard").value,
+            empId: document.getElementById("dlEmpId").value,
+            name: document.getElementById("dlName").value,
+            position: document.getElementById("dlPosition").value,
+            department: document.getElementById("dlDept").value,
+            company: document.getElementById("dlComp").value,
+            level: document.getElementById("dlLevel").value,
+            dob: document.getElementById("dlDob").value,
+            tel: document.getElementById("dlTel").value,
+            address: document.getElementById("dlAddr").value,
+            branch: document.getElementById("dlBranch").value,
+            startDate: document.getElementById("dlStart").value,
+            insuranceStatus: document.getElementById("dlInsStatus").value,
+            empStatus: document.getElementById("dlEmpStatus").value,
+            docUrl: document.getElementById("dlDocUrl").value,
+            newDoc: document.getElementById("dlDoc")
+        };
+
+        google.script.run.withSuccessHandler(function(res) {
+            btn.innerHTML = originalHtml; btn.disabled = false;
+            if(res === 'success') {
+                Swal.fire({icon: 'success', title: 'บันทึกสำเร็จ', timer: 1500, showConfirmButton: false});
+                var modal = bootstrap.Modal.getInstance(document.getElementById('dataLoginModal')); if(modal) modal.hide();
+                fetchDataLoginRecords();
+            } else {
+                Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: res});
+            }
+        }).saveDataLoginRecord(document.getElementById("dataLoginForm"));
+    }
+
+    function deleteDataLogin(rowNumber) {
+        Swal.fire({ title: 'ยืนยันการลบ?', text: "คุณต้องการลบข้อมูลพนักงานท่านนี้ใช่หรือไม่? ข้อมูลจะถูกลบออกจาก Data Login ถาวร", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if(result.isConfirmed) {
+                Swal.fire({title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                google.script.run.withSuccessHandler(function(res) {
+                    if(res === 'success') { Swal.fire({icon: 'success', title: 'ลบสำเร็จ', timer: 1500, showConfirmButton: false}); fetchDataLoginRecords(); }
+                    else { Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: res}); }
+                }).deleteDataLoginRecord(rowNumber);
+            }
+        });
+    }
+
+    function doubleConfirmDeleteInsurance(rowNumber, index) {
+        Swal.fire({
+            title: 'ยืนยันการลบครั้งที่ 1',
+            text: "คุณแน่ใจหรือไม่ที่จะลบรายการซื้อประกันนี้?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'ยืนยันลบ',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'ยืนยันการลบครั้งที่ 2 (ขั้นสุดท้าย)',
+                    text: "ข้อมูลนี้จะถูกลบออกจากฐานข้อมูลอย่างถาวร ยืนยันใช่หรือไม่?",
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'ยืนยันลบถาวร',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result2) => {
+                    if (result2.isConfirmed) {
+                        Swal.fire({title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                        google.script.run.withSuccessHandler(function(res) {
+                            if(res === 'success') {
+                                Swal.fire({icon: 'success', title: 'ลบข้อมูลสำเร็จ', timer: 1500, showConfirmButton: false});
+                                var modal = bootstrap.Modal.getInstance(document.getElementById('detailModal')); if(modal) modal.hide();
+                                fetchHRTableData();
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', res, 'error');
+                            }
+                        }).deleteInsuranceRecord(rowNumber);
+                    }
+                });
+            }
+        });
+    }
+
+    // ============================================
 
     function toggleEmailView(mode) {
         var formArea = document.getElementById("emailFormArea"); var sidebar = document.getElementById("autoSettingsSidebar");
@@ -1247,7 +1572,9 @@
                   if (record.slipStatus === 'สลิปโอนเงินถูกต้อง') approveBtn = '<button type="button" class="btn btn-info text-white me-auto mb-2 mb-md-0" onclick="approveInsurance(' + record.rowNumber + ')"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งเข้า</button>';
                   else approveBtn = '<button type="button" class="btn btn-secondary text-white me-auto mb-2 mb-md-0" onclick="Swal.fire({icon: \'warning\', title: \'ไม่สามารถอนุมัติได้\', text: \'กรุณาตรวจสอบและตั้งค่าสลิปให้ถูกต้องก่อน\'})"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งเข้า</button>';
               } else if (record.status === 'รอแจ้งออก') { approveBtn = '<button type="button" class="btn btn-danger text-white me-auto mb-2 mb-md-0" onclick="approveCancelInsurance(' + record.rowNumber + ')"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งออก</button>'; }
-              modalFooter.innerHTML = approveBtn + '<button type="button" class="btn btn-secondary mb-2 mb-md-0" data-bs-dismiss="modal">ปิดหน้าต่าง</button><button type="button" class="btn btn-success mb-2 mb-md-0" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
+              
+              // เพิ่มปุ่มลบรายการ (Double Confirm) สำหรับ HR
+              modalFooter.innerHTML = approveBtn + '<button type="button" class="btn btn-danger mb-2 mb-md-0 me-auto" onclick="doubleConfirmDeleteInsurance(' + record.rowNumber + ', ' + index + ')"><i class="bi bi-trash me-1"></i> ลบรายการนี้</button><button type="button" class="btn btn-secondary mb-2 mb-md-0" data-bs-dismiss="modal">ปิดหน้าต่าง</button><button type="button" class="btn btn-success mb-2 mb-md-0" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
           } else {
               modalFooter.innerHTML = '<button type="button" class="btn btn-secondary mb-2 mb-md-0" data-bs-dismiss="modal">ปิดหน้าต่าง</button><button type="button" class="btn btn-success mb-2 mb-md-0" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
           }
