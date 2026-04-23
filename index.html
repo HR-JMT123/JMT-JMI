@@ -26,8 +26,8 @@
     .logo-icon { font-size: 2.5rem; color: #4e54c8; margin-bottom: 10px; }
     @media (min-width: 768px) { .logo-icon { font-size: 3.5rem; } }
     
-    .form-control { border-radius: 10px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s; }
-    .form-control:focus { box-shadow: 0 0 0 0.25rem rgba(78, 84, 200, 0.25); border-color: #4e54c8; }
+    .form-control, .form-select { border-radius: 10px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s; }
+    .form-control:focus, .form-select:focus { box-shadow: 0 0 0 0.25rem rgba(78, 84, 200, 0.25); border-color: #4e54c8; }
     .readonly-field { background-color: #f4f6f9; color: #6c757d; border: 1px dashed #ced4da; }
     .btn-primary-custom { background: linear-gradient(45deg, #4e54c8, #8f94fb); border: none; border-radius: 10px; padding: 12px; font-weight: 500; font-size: 1.1rem; transition: transform 0.2s, box-shadow 0.2s; }
     .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(78, 84, 200, 0.4); }
@@ -38,11 +38,10 @@
     .input-group-text { background-color: white; border-radius: 10px 0 0 10px; border-right: none; }
     .input-group .form-control { border-left: none; }
 
-    /* ปรับแต่งตารางให้เลื่อน ซ้าย-ขวา และ ขึ้น-ลง ได้อิสระ พร้อมทำ Sticky Header */
     .custom-table-container { 
         border-radius: 10px; 
-        overflow: auto; /* เลื่อนได้ทั้ง 2 แกน */
-        max-height: 65vh; /* จำกัดความสูงสูงสุดเพื่อให้เลื่อนขึ้น-ลงได้ */
+        overflow: auto; 
+        max-height: 65vh; 
         border: 1px solid #e0e0e0; 
         background-color: white; 
         -webkit-overflow-scrolling: touch; 
@@ -50,7 +49,7 @@
     .custom-table th { 
         position: sticky; 
         top: 0; 
-        z-index: 5; /* ให้อยู่เหนือเนื้อหาในตาราง */
+        z-index: 5; 
         background-color: #4e54c8; 
         color: #ffffff; 
         font-weight: 400; 
@@ -66,7 +65,6 @@
         white-space: nowrap; 
         min-width: 100px; 
     }
-    /* ปรับแต่งหน้าตา Scrollbar */
     .custom-table-container::-webkit-scrollbar { width: 8px; height: 8px; }
     .custom-table-container::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 10px; }
     .custom-table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
@@ -341,6 +339,10 @@
                         <th>Level</th>
                         <th>Insurance Status</th>
                         <th>Employee Status</th>
+                        <th>อายุงาน</th>
+                        <th>วันทำงานวันสุดท้าย</th>
+                        <th>หมายเหตุ</th>
+                        <th>Check_HR-Home</th>
                         <th>เอกสาร</th>
                     </tr>
                 </thead>
@@ -383,14 +385,24 @@
                  <div class="col-md-6"><label class="form-label small text-muted mb-1">Position</label><input type="text" id="dlPosition" class="form-control form-control-sm"></div>
                  <div class="col-md-6"><label class="form-label small text-muted mb-1">Department</label><input type="text" id="dlDept" class="form-control form-control-sm"></div>
                  <div class="col-md-4"><label class="form-label small text-muted mb-1">Company</label><input type="text" id="dlComp" class="form-control form-control-sm"></div>
-                 <div class="col-md-4"><label class="form-label small text-muted mb-1">Level</label><input type="text" id="dlLevel" class="form-control form-control-sm"></div>
+                 
+                 <div class="col-md-4">
+                     <label class="form-label small text-muted mb-1">Level</label>
+                     <select id="dlLevel" class="form-select form-select-sm">
+                         <option value="">-- เลือกระดับ --</option>
+                         <option value="Emp">Emp</option>
+                         <option value="HR">HR</option>
+                         <option value="JMI">JMI</option>
+                     </select>
+                 </div>
+                 
                  <div class="col-md-4"><label class="form-label small text-muted mb-1">DOB (วันเกิด)</label><input type="date" id="dlDob" class="form-control form-control-sm"></div>
                  <div class="col-md-4"><label class="form-label small text-muted mb-1">Tel</label><input type="text" id="dlTel" class="form-control form-control-sm" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');"></div>
                  <div class="col-md-4"><label class="form-label small text-muted mb-1">Branch</label><input type="text" id="dlBranch" class="form-control form-control-sm"></div>
                  <div class="col-md-4"><label class="form-label small text-muted mb-1">Start Date</label><input type="date" id="dlStart" class="form-control form-control-sm"></div>
                  <div class="col-12"><label class="form-label small text-muted mb-1">Address</label><textarea id="dlAddr" class="form-control form-control-sm" rows="2"></textarea></div>
                  
-                 <div class="col-12 border-top pt-3 mt-4"><h6 class="text-primary fw-bold"><i class="bi bi-gear-fill me-2"></i>ตั้งค่าสถานะ (Status)</h6></div>
+                 <div class="col-12 border-top pt-3 mt-4"><h6 class="text-primary fw-bold"><i class="bi bi-gear-fill me-2"></i>ตั้งค่าสถานะ (Status) & ข้อมูลเพิ่มเติม</h6></div>
                  <div class="col-md-6">
                      <label class="form-label small fw-bold text-dark mb-1">Insurance Status</label>
                      <select id="dlInsStatus" class="form-select form-select-sm border-secondary">
@@ -407,6 +419,22 @@
                          <option value="ลาออก">ลาออก</option>
                      </select>
                      <small class="text-danger d-block mt-1" style="font-size: 0.7rem;">*หากตั้งเป็น "ลาออก" จะไม่สามารถ Login ได้</small>
+                 </div>
+
+                 <div class="col-md-6">
+                     <label class="form-label small text-muted mb-1">วันที่ทำงานวันสุดท้าย</label>
+                     <input type="date" id="dlLastDate" class="form-control form-control-sm">
+                 </div>
+                 <div class="col-md-6">
+                     <label class="form-label small text-muted mb-1">Check_HR-Home</label>
+                     <select id="dlCheckHrHome" class="form-select form-select-sm border-primary">
+                         <option value="New">New</option>
+                         <option value="Payroll">Payroll</option>
+                     </select>
+                 </div>
+                 <div class="col-12">
+                     <label class="form-label small text-muted mb-1">หมายเหตุ (สาเหตุการลาออก / อื่นๆ)</label>
+                     <textarea id="dlRemark" class="form-control form-control-sm" rows="2"></textarea>
                  </div>
                  
                  <div class="col-12 mt-3">
@@ -540,7 +568,7 @@
   </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyT5nOsTAbOzqx6LWqQZ3jCxVOUCfgH8dBptof6WkQ6kyP8yWpmCiw92BCY12_kE65C/exec"; 
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1WxXdEFE7Y80Y5TfEemZX_uEghIKrc7t5mkRPmbbIYauok92SlrhZYV_H89gn7LQH/exec"; 
 
     const google = {
       script: {
@@ -1017,7 +1045,7 @@
     // ============================================
     function fetchDataLoginRecords() {
         var tbody = document.getElementById("dataLoginTableBody");
-        tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><br><small class="text-muted mt-2 d-block">กำลังโหลดฐานข้อมูลพนักงาน...</small></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="15" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><br><small class="text-muted mt-2 d-block">กำลังโหลดฐานข้อมูลพนักงาน...</small></td></tr>';
         google.script.run.withSuccessHandler(function(data) {
             dataLoginRecords = data;
             renderDataLoginTable(data);
@@ -1029,7 +1057,7 @@
         tbody.innerHTML = "";
         document.getElementById("dataLoginTotalCount").innerText = "รวม " + dataList.length + " รายการ";
         if(dataList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-3">ไม่มีข้อมูลในฐานระบบ</td></tr>'; return;
+            tbody.innerHTML = '<tr><td colspan="15" class="text-center text-muted py-3">ไม่มีข้อมูลในฐานระบบ</td></tr>'; return;
         }
         dataList.forEach((r, idx) => {
             var eStatusClass = r.empStatus === 'ทำงาน' ? 'text-success' : 'text-danger';
@@ -1051,6 +1079,10 @@
                 <td>${r.level}</td>
                 <td><strong class="${iStatusClass}">${r.insuranceStatus}</strong></td>
                 <td><strong class="${eStatusClass}">${r.empStatus}</strong></td>
+                <td>${r.tenure}</td>
+                <td>${r.lastDate || '-'}</td>
+                <td>${r.remark || '-'}</td>
+                <td>${r.checkHrHome}</td>
                 <td>${docBtn}</td>
             `;
             tbody.appendChild(tr);
@@ -1068,14 +1100,14 @@
     function exportDataLoginExcel() {
         if (dataLoginRecords.length === 0) { Swal.fire({icon: 'info', title: 'ไม่มีข้อมูล', text: 'ไม่มีข้อมูล Data Login สำหรับ Export'}); return; }
         
-        let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1" style="border-collapse: collapse;"><thead><tr style="background-color: #6c757d; color: #ffffff; font-weight: bold;"><th>ID Card</th><th>Employee ID</th><th>Name</th><th>Position</th><th>Department</th><th>Company</th><th>Level</th><th>DOB</th><th>Tel</th><th>Address</th><th>Branch</th><th>Start Date</th><th>Insurance Status</th><th>Employee Status</th><th>Document URL</th></tr></thead><tbody>`;
+        let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1" style="border-collapse: collapse;"><thead><tr style="background-color: #6c757d; color: #ffffff; font-weight: bold;"><th>ID Card</th><th>Employee ID</th><th>Name</th><th>Position</th><th>Department</th><th>Company</th><th>Level</th><th>DOB</th><th>Tel</th><th>Address</th><th>Branch</th><th>Start Date</th><th>Insurance Status</th><th>Employee Status</th><th>อายุงาน</th><th>วันทำงานวันสุดท้าย</th><th>หมายเหตุ</th><th>Check_HR-Home</th><th>Document URL</th></tr></thead><tbody>`;
         
         var input = document.getElementById("searchDataLogin").value.toUpperCase();
         var exportData = dataLoginRecords;
         if(input) { exportData = dataLoginRecords.filter(r => Object.values(r).some(val => val && val.toString().toUpperCase().indexOf(input) > -1)); }
 
         exportData.forEach(r => { 
-            tableHtml += `<tr><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.idCard || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.empId || '-'}</td><td style="border: 1px solid #000;">${r.name || '-'}</td><td style="border: 1px solid #000;">${r.position || '-'}</td><td style="border: 1px solid #000;">${r.department || '-'}</td><td style="border: 1px solid #000;">${r.company || '-'}</td><td style="border: 1px solid #000;">${r.level || '-'}</td><td style="border: 1px solid #000;">${r.dob || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.tel || '-'}</td><td style="border: 1px solid #000;">${r.address || '-'}</td><td style="border: 1px solid #000;">${r.branch || '-'}</td><td style="border: 1px solid #000;">${r.startDate || '-'}</td><td style="border: 1px solid #000;">${r.insuranceStatus || '-'}</td><td style="border: 1px solid #000;">${r.empStatus || '-'}</td><td style="border: 1px solid #000;">${r.docUrl || '-'}</td></tr>`; 
+            tableHtml += `<tr><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.idCard || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.empId || '-'}</td><td style="border: 1px solid #000;">${r.name || '-'}</td><td style="border: 1px solid #000;">${r.position || '-'}</td><td style="border: 1px solid #000;">${r.department || '-'}</td><td style="border: 1px solid #000;">${r.company || '-'}</td><td style="border: 1px solid #000;">${r.level || '-'}</td><td style="border: 1px solid #000;">${r.dob || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.tel || '-'}</td><td style="border: 1px solid #000;">${r.address || '-'}</td><td style="border: 1px solid #000;">${r.branch || '-'}</td><td style="border: 1px solid #000;">${r.startDate || '-'}</td><td style="border: 1px solid #000;">${r.insuranceStatus || '-'}</td><td style="border: 1px solid #000;">${r.empStatus || '-'}</td><td style="border: 1px solid #000;">${r.tenure || '-'}</td><td style="border: 1px solid #000;">${r.lastDate || '-'}</td><td style="border: 1px solid #000;">${r.remark || '-'}</td><td style="border: 1px solid #000;">${r.checkHrHome || '-'}</td><td style="border: 1px solid #000;">${r.docUrl || '-'}</td></tr>`; 
         });
         tableHtml += `</tbody></table></body></html>`;
 
@@ -1105,6 +1137,17 @@
             document.getElementById("dlStart").value = r.startDate;
             document.getElementById("dlInsStatus").value = r.insuranceStatus;
             document.getElementById("dlEmpStatus").value = r.empStatus;
+            
+            // ข้อมูลใหม่
+            if(r.lastDate && r.lastDate !== "-") {
+                try {
+                    let p = r.lastDate.split('-');
+                    if(p.length === 3) document.getElementById("dlLastDate").value = r.lastDate;
+                } catch(e) {}
+            }
+            document.getElementById("dlRemark").value = r.remark;
+            document.getElementById("dlCheckHrHome").value = r.checkHrHome || "New";
+
             if(r.docUrl) {
                 document.getElementById("dlDocUrl").value = r.docUrl;
                 document.getElementById("dlDocPreview").innerHTML = `<a href="${r.docUrl}" target="_blank" class="badge bg-info text-dark text-decoration-none"><i class="bi bi-file-earmark-text"></i> ดูเอกสารที่มีอยู่แล้ว</a>`;
@@ -1114,12 +1157,29 @@
             document.getElementById("dlRowNumber").value = "";
             document.getElementById("dlInsStatus").value = "รอดำเนินการ";
             document.getElementById("dlEmpStatus").value = "ทำงาน";
+            document.getElementById("dlCheckHrHome").value = "New";
         }
         var modal = new bootstrap.Modal(document.getElementById('dataLoginModal'));
         modal.show();
     }
 
     function submitDataLogin() {
+        var empStatus = document.getElementById("dlEmpStatus").value;
+        var lastDate = document.getElementById("dlLastDate").value;
+        var remark = document.getElementById("dlRemark").value;
+
+        // Validation กรณ๊ลาออก
+        if (empStatus === 'ลาออก') {
+            if (!lastDate || !remark.trim()) {
+                Swal.fire({
+                    icon: 'warning', 
+                    title: 'ข้อมูลไม่ครบถ้วน', 
+                    text: 'กรณีเปลี่ยนสถานะเป็น "ลาออก" กรุณาระบุ "วันที่ทำงานวันสุดท้าย" และ "หมายเหตุ" ให้ครบถ้วน'
+                });
+                return; 
+            }
+        }
+
         var btn = document.getElementById("btnSaveDataLogin");
         var originalHtml = btn.innerHTML;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังบันทึก...';
@@ -1140,7 +1200,10 @@
             branch: document.getElementById("dlBranch").value,
             startDate: document.getElementById("dlStart").value,
             insuranceStatus: document.getElementById("dlInsStatus").value,
-            empStatus: document.getElementById("dlEmpStatus").value,
+            empStatus: empStatus,
+            lastDate: lastDate,
+            remark: remark,
+            checkHrHome: document.getElementById("dlCheckHrHome").value,
             docUrl: document.getElementById("dlDocUrl").value,
             newDoc: document.getElementById("dlDoc")
         };
@@ -1573,7 +1636,6 @@
                   else approveBtn = '<button type="button" class="btn btn-secondary text-white me-auto mb-2 mb-md-0" onclick="Swal.fire({icon: \'warning\', title: \'ไม่สามารถอนุมัติได้\', text: \'กรุณาตรวจสอบและตั้งค่าสลิปให้ถูกต้องก่อน\'})"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งเข้า</button>';
               } else if (record.status === 'รอแจ้งออก') { approveBtn = '<button type="button" class="btn btn-danger text-white me-auto mb-2 mb-md-0" onclick="approveCancelInsurance(' + record.rowNumber + ')"><i class="bi bi-check2-square me-1"></i> ยืนยันแจ้งออก</button>'; }
               
-              // เพิ่มปุ่มลบรายการ (Double Confirm) สำหรับ HR
               modalFooter.innerHTML = approveBtn + '<button type="button" class="btn btn-danger mb-2 mb-md-0 me-auto" onclick="doubleConfirmDeleteInsurance(' + record.rowNumber + ', ' + index + ')"><i class="bi bi-trash me-1"></i> ลบรายการนี้</button><button type="button" class="btn btn-secondary mb-2 mb-md-0" data-bs-dismiss="modal">ปิดหน้าต่าง</button><button type="button" class="btn btn-success mb-2 mb-md-0" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
           } else {
               modalFooter.innerHTML = '<button type="button" class="btn btn-secondary mb-2 mb-md-0" data-bs-dismiss="modal">ปิดหน้าต่าง</button><button type="button" class="btn btn-success mb-2 mb-md-0" onclick="saveFullRecord(' + record.rowNumber + ')"><i class="bi bi-save me-1"></i> บันทึกการแก้ไข</button>';
