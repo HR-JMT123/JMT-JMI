@@ -337,12 +337,13 @@
                         <th>Department</th>
                         <th>Company</th>
                         <th>Level</th>
-                        <th>Insurance Status</th>
-                        <th>Employee Status</th>
+                        <th>สถานะค้ำประกัน</th>
+                        <th>สถานะการทำงาน</th>
+                        <th>วันเริ่มงาน</th>
                         <th>อายุงาน</th>
                         <th>วันทำงานวันสุดท้าย</th>
                         <th>หมายเหตุ</th>
-                        <th>Check_HR-Home</th>
+                        <th>สถานะฐานข้อมูล</th>
                         <th>เอกสาร</th>
                     </tr>
                 </thead>
@@ -404,16 +405,17 @@
                  
                  <div class="col-12 border-top pt-3 mt-4"><h6 class="text-primary fw-bold"><i class="bi bi-gear-fill me-2"></i>ตั้งค่าสถานะ (Status) & ข้อมูลเพิ่มเติม</h6></div>
                  <div class="col-md-6">
-                     <label class="form-label small fw-bold text-dark mb-1">Insurance Status</label>
+                     <label class="form-label small fw-bold text-dark mb-1">สถานะค้ำประกัน</label>
                      <select id="dlInsStatus" class="form-select form-select-sm border-secondary">
                          <option value="รอดำเนินการ">รอดำเนินการ</option>
                          <option value="ซื้อค้ำประกัน">ซื้อค้ำประกัน</option>
                          <option value="มีค้ำประกัน">มีค้ำประกัน</option>
+                         <option value="ไม่ใช้ค้ำประกัน">ไม่ใช้ค้ำประกัน</option>
                      </select>
                      <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">*ระบบจะอัปเดตเป็น ซื้อค้ำอัตโนมัติ หากเจอในหน้าซื้อประกัน</small>
                  </div>
                  <div class="col-md-6">
-                     <label class="form-label small fw-bold text-danger mb-1">Employee Status <span class="text-danger">*</span></label>
+                     <label class="form-label small fw-bold text-danger mb-1">สถานะการทำงาน <span class="text-danger">*</span></label>
                      <select id="dlEmpStatus" class="form-select form-select-sm border-danger" required>
                          <option value="ทำงาน">ทำงาน</option>
                          <option value="ลาออก">ลาออก</option>
@@ -426,7 +428,7 @@
                      <input type="date" id="dlLastDate" class="form-control form-control-sm">
                  </div>
                  <div class="col-md-6">
-                     <label class="form-label small text-muted mb-1">Check_HR-Home</label>
+                     <label class="form-label small text-muted mb-1">สถานะฐานข้อมูล</label>
                      <select id="dlCheckHrHome" class="form-select form-select-sm border-primary">
                          <option value="New">New</option>
                          <option value="Payroll">Payroll</option>
@@ -568,7 +570,7 @@
   </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1WxXdEFE7Y80Y5TfEemZX_uEghIKrc7t5mkRPmbbIYauok92SlrhZYV_H89gn7LQH/exec"; 
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyCSr7r6DaEpCktgMGMAqdig0GG9711jsWi8wdVBQsyPcZt6OEsKLPd1aVZ3sR80OBl/exec"; 
 
     const google = {
       script: {
@@ -1045,7 +1047,7 @@
     // ============================================
     function fetchDataLoginRecords() {
         var tbody = document.getElementById("dataLoginTableBody");
-        tbody.innerHTML = '<tr><td colspan="15" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><br><small class="text-muted mt-2 d-block">กำลังโหลดฐานข้อมูลพนักงาน...</small></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="16" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><br><small class="text-muted mt-2 d-block">กำลังโหลดฐานข้อมูลพนักงาน...</small></td></tr>';
         google.script.run.withSuccessHandler(function(data) {
             dataLoginRecords = data;
             renderDataLoginTable(data);
@@ -1057,11 +1059,12 @@
         tbody.innerHTML = "";
         document.getElementById("dataLoginTotalCount").innerText = "รวม " + dataList.length + " รายการ";
         if(dataList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="15" class="text-center text-muted py-3">ไม่มีข้อมูลในฐานระบบ</td></tr>'; return;
+            tbody.innerHTML = '<tr><td colspan="16" class="text-center text-muted py-3">ไม่มีข้อมูลในฐานระบบ</td></tr>'; return;
         }
         dataList.forEach((r, idx) => {
             var eStatusClass = r.empStatus === 'ทำงาน' ? 'text-success' : 'text-danger';
             var iStatusClass = (r.insuranceStatus === 'ซื้อค้ำประกัน' || r.insuranceStatus === 'มีค้ำประกัน') ? 'text-success' : 'text-warning';
+            if (r.insuranceStatus === 'ไม่ใช้ค้ำประกัน') iStatusClass = 'text-secondary';
             var docBtn = r.docUrl ? `<button class="btn btn-sm btn-outline-info" onclick="viewDocument('${r.docUrl}')" title="ดูเอกสาร"><i class="bi bi-file-earmark-text"></i></button>` : `<span class="text-muted small">-</span>`;
             
             var tr = document.createElement("tr");
@@ -1079,6 +1082,7 @@
                 <td>${r.level}</td>
                 <td><strong class="${iStatusClass}">${r.insuranceStatus}</strong></td>
                 <td><strong class="${eStatusClass}">${r.empStatus}</strong></td>
+                <td>${r.startDate || '-'}</td>
                 <td>${r.tenure}</td>
                 <td>${r.lastDate || '-'}</td>
                 <td>${r.remark || '-'}</td>
@@ -1100,7 +1104,7 @@
     function exportDataLoginExcel() {
         if (dataLoginRecords.length === 0) { Swal.fire({icon: 'info', title: 'ไม่มีข้อมูล', text: 'ไม่มีข้อมูล Data Login สำหรับ Export'}); return; }
         
-        let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1" style="border-collapse: collapse;"><thead><tr style="background-color: #6c757d; color: #ffffff; font-weight: bold;"><th>ID Card</th><th>Employee ID</th><th>Name</th><th>Position</th><th>Department</th><th>Company</th><th>Level</th><th>DOB</th><th>Tel</th><th>Address</th><th>Branch</th><th>Start Date</th><th>Insurance Status</th><th>Employee Status</th><th>อายุงาน</th><th>วันทำงานวันสุดท้าย</th><th>หมายเหตุ</th><th>Check_HR-Home</th><th>Document URL</th></tr></thead><tbody>`;
+        let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1" style="border-collapse: collapse;"><thead><tr style="background-color: #6c757d; color: #ffffff; font-weight: bold;"><th>ID Card</th><th>Employee ID</th><th>Name</th><th>Position</th><th>Department</th><th>Company</th><th>Level</th><th>DOB</th><th>Tel</th><th>Address</th><th>Branch</th><th>วันเริ่มงาน</th><th>สถานะค้ำประกัน</th><th>สถานะการทำงาน</th><th>อายุงาน</th><th>วันทำงานวันสุดท้าย</th><th>หมายเหตุ</th><th>สถานะฐานข้อมูล</th><th>Document URL</th></tr></thead><tbody>`;
         
         var input = document.getElementById("searchDataLogin").value.toUpperCase();
         var exportData = dataLoginRecords;
