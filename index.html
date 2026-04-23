@@ -69,6 +69,12 @@
     .custom-table-container::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 10px; }
     .custom-table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
     
+    /* สไตล์สำหรับให้คอลัมน์ จัดการ ติดอยู่ด้านซ้ายเสมอ */
+    #pane-datalogin .custom-table-container { overflow-x: auto; }
+    #dataLoginTableBody td:first-child { position: sticky; left: 0; background-color: #ffffff; z-index: 2; border-right: 2px solid #dee2e6; }
+    #pane-datalogin .custom-table th:first-child { position: sticky; left: 0; background-color: #4e54c8; z-index: 10; border-right: 2px solid #dee2e6; }
+    #dataLoginTableBody tr:hover td:first-child { background-color: #f1f3ff; }
+
     .status-badge { display: inline-block; width: 130px; text-align: center; font-weight: 400; font-size: 0.75rem; padding: 6px 12px; }
     .doc-badge { display: inline-block; width: 120px; text-align: center; font-weight: 400; font-size: 0.75rem; padding: 6px 12px; }
     .doc-cell-wrapper { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 5px; }
@@ -331,18 +337,22 @@
                     <tr>
                         <th>จัดการ</th>
                         <th>ID Card</th>
-                        <th>Emp ID</th>
+                        <th>Employee ID</th>
                         <th>Name</th>
                         <th>Position</th>
                         <th>Department</th>
                         <th>Company</th>
                         <th>Level</th>
-                        <th>สถานะค้ำประกัน</th>
-                        <th>สถานะการทำงาน</th>
+                        <th>วดป เกิด</th>
+                        <th>Tel</th>
+                        <th>ที่อยู่</th>
+                        <th>สาขา</th>
                         <th>วันเริ่มงาน</th>
                         <th>อายุงาน</th>
+                        <th>สถานะค้ำประกัน</th>
+                        <th>สถานะการทำงาน</th>
                         <th>วันทำงานวันสุดท้าย</th>
-                        <th>หมายเหตุ</th>
+                        <th>สาเหตุการลาออก</th>
                         <th>สถานะฐานข้อมูล</th>
                         <th>เอกสาร</th>
                     </tr>
@@ -416,7 +426,7 @@
                  </div>
                  <div class="col-md-6">
                      <label class="form-label small fw-bold text-danger mb-1">สถานะการทำงาน <span class="text-danger">*</span></label>
-                     <select id="dlEmpStatus" class="form-select form-select-sm border-danger" required>
+                     <select id="dlEmpStatus" class="form-select form-select-sm border-danger" onchange="toggleResignFields(true)" required>
                          <option value="ทำงาน">ทำงาน</option>
                          <option value="ลาออก">ลาออก</option>
                      </select>
@@ -425,7 +435,7 @@
 
                  <div class="col-md-6">
                      <label class="form-label small text-muted mb-1">วันที่ทำงานวันสุดท้าย</label>
-                     <input type="date" id="dlLastDate" class="form-control form-control-sm">
+                     <input type="date" id="dlLastDate" class="form-control form-control-sm" disabled>
                  </div>
                  <div class="col-md-6">
                      <label class="form-label small text-muted mb-1">สถานะฐานข้อมูล</label>
@@ -435,8 +445,8 @@
                      </select>
                  </div>
                  <div class="col-12">
-                     <label class="form-label small text-muted mb-1">หมายเหตุ (สาเหตุการลาออก / อื่นๆ)</label>
-                     <textarea id="dlRemark" class="form-control form-control-sm" rows="2"></textarea>
+                     <label class="form-label small text-muted mb-1">สาเหตุการลาออก / หมายเหตุอื่นๆ</label>
+                     <textarea id="dlRemark" class="form-control form-control-sm" rows="2" disabled></textarea>
                  </div>
                  
                  <div class="col-12 mt-3">
@@ -570,7 +580,7 @@
   </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyCSr7r6DaEpCktgMGMAqdig0GG9711jsWi8wdVBQsyPcZt6OEsKLPd1aVZ3sR80OBl/exec"; 
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxACzFgpYZDTUSPCjjApAVeos1ERhUaN92UgYQL4NMNcGE49sqP6brJtvX4R0-qsMWs/exec"; 
 
     const google = {
       script: {
@@ -654,7 +664,7 @@
     const AVAILABLE_COLUMNS = [
         { id: 'idCard', label: 'ID Card' }, { id: 'empId', label: 'Employee ID' },
         { id: 'name', label: 'Name' }, { id: 'position', label: 'Position' },
-        { id: 'company', label: 'Company' }, { id: 'empStatus', label: 'Employee Status' },
+        { id: 'company', label: 'Company' }, { id: 'empStatus', label: 'สถานะการทำงาน' },
         { id: 'dob', label: 'วดป เกิด' }, { id: 'tel', label: 'Tel' },
         { id: 'address', label: 'ที่อยู่' }, { id: 'branch', label: 'สาขา' },
         { id: 'insuranceType', label: 'ประเภทการซื้อประกัน' }, { id: 'coverageStart', label: 'เริ่มคุ้มครอง' },
@@ -739,7 +749,7 @@
     }
 
     function viewDocument(url) {
-        if (!url) return; let embedUrl = url; if (url.indexOf("drive.google.com") !== -1 && url.indexOf("/view") !== -1) { embedUrl = url.replace(/\/view.*/, "/preview"); }
+        if (!url || url === "-") return; let embedUrl = url; if (url.indexOf("drive.google.com") !== -1 && url.indexOf("/view") !== -1) { embedUrl = url.replace(/\/view.*/, "/preview"); }
         Swal.fire({ html: '<iframe src="' + embedUrl + '" width="100%" height="80vh" style="border:none; min-height: 600px;"></iframe>', showCloseButton: true, showConfirmButton: false, width: '80%', padding: '1em' });
     }
 
@@ -1047,7 +1057,7 @@
     // ============================================
     function fetchDataLoginRecords() {
         var tbody = document.getElementById("dataLoginTableBody");
-        tbody.innerHTML = '<tr><td colspan="16" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><br><small class="text-muted mt-2 d-block">กำลังโหลดฐานข้อมูลพนักงาน...</small></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="20" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><br><small class="text-muted mt-2 d-block">กำลังโหลดฐานข้อมูลพนักงาน...</small></td></tr>';
         google.script.run.withSuccessHandler(function(data) {
             dataLoginRecords = data;
             renderDataLoginTable(data);
@@ -1059,7 +1069,7 @@
         tbody.innerHTML = "";
         document.getElementById("dataLoginTotalCount").innerText = "รวม " + dataList.length + " รายการ";
         if(dataList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="16" class="text-center text-muted py-3">ไม่มีข้อมูลในฐานระบบ</td></tr>'; return;
+            tbody.innerHTML = '<tr><td colspan="20" class="text-center text-muted py-3">ไม่มีข้อมูลในฐานระบบ</td></tr>'; return;
         }
         dataList.forEach((r, idx) => {
             var eStatusClass = r.empStatus === 'ทำงาน' ? 'text-success' : 'text-danger';
@@ -1080,10 +1090,14 @@
                 <td>${r.department}</td>
                 <td>${r.company}</td>
                 <td>${r.level}</td>
-                <td><strong class="${iStatusClass}">${r.insuranceStatus}</strong></td>
-                <td><strong class="${eStatusClass}">${r.empStatus}</strong></td>
+                <td>${r.dob || '-'}</td>
+                <td style="mso-number-format:'\\@';">${r.tel || '-'}</td>
+                <td>${r.address || '-'}</td>
+                <td>${r.branch || '-'}</td>
                 <td>${r.startDate || '-'}</td>
                 <td>${r.tenure}</td>
+                <td><strong class="${iStatusClass}">${r.insuranceStatus}</strong></td>
+                <td><strong class="${eStatusClass}">${r.empStatus}</strong></td>
                 <td>${r.lastDate || '-'}</td>
                 <td>${r.remark || '-'}</td>
                 <td>${r.checkHrHome}</td>
@@ -1104,18 +1118,40 @@
     function exportDataLoginExcel() {
         if (dataLoginRecords.length === 0) { Swal.fire({icon: 'info', title: 'ไม่มีข้อมูล', text: 'ไม่มีข้อมูล Data Login สำหรับ Export'}); return; }
         
-        let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1" style="border-collapse: collapse;"><thead><tr style="background-color: #6c757d; color: #ffffff; font-weight: bold;"><th>ID Card</th><th>Employee ID</th><th>Name</th><th>Position</th><th>Department</th><th>Company</th><th>Level</th><th>DOB</th><th>Tel</th><th>Address</th><th>Branch</th><th>วันเริ่มงาน</th><th>สถานะค้ำประกัน</th><th>สถานะการทำงาน</th><th>อายุงาน</th><th>วันทำงานวันสุดท้าย</th><th>หมายเหตุ</th><th>สถานะฐานข้อมูล</th><th>Document URL</th></tr></thead><tbody>`;
+        let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1" style="border-collapse: collapse;"><thead><tr style="background-color: #6c757d; color: #ffffff; font-weight: bold;"><th>ID Card</th><th>Employee ID</th><th>Name</th><th>Position</th><th>Department</th><th>Company</th><th>Level</th><th>วดป เกิด</th><th>Tel</th><th>ที่อยู่</th><th>สาขา</th><th>วันเริ่มงาน</th><th>อายุงาน</th><th>สถานะค้ำประกัน</th><th>สถานะการทำงาน</th><th>วันทำงานวันสุดท้าย</th><th>สาเหตุการลาออก</th><th>สถานะฐานข้อมูล</th><th>Document URL</th></tr></thead><tbody>`;
         
         var input = document.getElementById("searchDataLogin").value.toUpperCase();
         var exportData = dataLoginRecords;
         if(input) { exportData = dataLoginRecords.filter(r => Object.values(r).some(val => val && val.toString().toUpperCase().indexOf(input) > -1)); }
 
         exportData.forEach(r => { 
-            tableHtml += `<tr><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.idCard || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.empId || '-'}</td><td style="border: 1px solid #000;">${r.name || '-'}</td><td style="border: 1px solid #000;">${r.position || '-'}</td><td style="border: 1px solid #000;">${r.department || '-'}</td><td style="border: 1px solid #000;">${r.company || '-'}</td><td style="border: 1px solid #000;">${r.level || '-'}</td><td style="border: 1px solid #000;">${r.dob || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.tel || '-'}</td><td style="border: 1px solid #000;">${r.address || '-'}</td><td style="border: 1px solid #000;">${r.branch || '-'}</td><td style="border: 1px solid #000;">${r.startDate || '-'}</td><td style="border: 1px solid #000;">${r.insuranceStatus || '-'}</td><td style="border: 1px solid #000;">${r.empStatus || '-'}</td><td style="border: 1px solid #000;">${r.tenure || '-'}</td><td style="border: 1px solid #000;">${r.lastDate || '-'}</td><td style="border: 1px solid #000;">${r.remark || '-'}</td><td style="border: 1px solid #000;">${r.checkHrHome || '-'}</td><td style="border: 1px solid #000;">${r.docUrl || '-'}</td></tr>`; 
+            tableHtml += `<tr><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.idCard || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.empId || '-'}</td><td style="border: 1px solid #000;">${r.name || '-'}</td><td style="border: 1px solid #000;">${r.position || '-'}</td><td style="border: 1px solid #000;">${r.department || '-'}</td><td style="border: 1px solid #000;">${r.company || '-'}</td><td style="border: 1px solid #000;">${r.level || '-'}</td><td style="border: 1px solid #000;">${r.dob || '-'}</td><td style="mso-number-format:'\\@'; border: 1px solid #000;">${r.tel || '-'}</td><td style="border: 1px solid #000;">${r.address || '-'}</td><td style="border: 1px solid #000;">${r.branch || '-'}</td><td style="border: 1px solid #000;">${r.startDate || '-'}</td><td style="border: 1px solid #000;">${r.tenure || '-'}</td><td style="border: 1px solid #000;">${r.insuranceStatus || '-'}</td><td style="border: 1px solid #000;">${r.empStatus || '-'}</td><td style="border: 1px solid #000;">${r.lastDate || '-'}</td><td style="border: 1px solid #000;">${r.remark || '-'}</td><td style="border: 1px solid #000;">${r.checkHrHome || '-'}</td><td style="border: 1px solid #000;">${r.docUrl || '-'}</td></tr>`; 
         });
         tableHtml += `</tbody></table></body></html>`;
 
         var blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel' }); var url = URL.createObjectURL(blob); var a = document.createElement("a"); a.href = url; a.download = 'Data_Login_' + new Date().getTime() + '.xls'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+
+    function toggleResignFields(isChange) {
+        var empStatus = document.getElementById("dlEmpStatus").value;
+        var lastDate = document.getElementById("dlLastDate");
+        var remark = document.getElementById("dlRemark");
+
+        if (empStatus === "ลาออก") {
+            lastDate.disabled = false;
+            lastDate.required = true;
+            remark.disabled = false;
+            remark.required = true;
+        } else {
+            lastDate.disabled = true;
+            lastDate.required = false;
+            remark.disabled = true;
+            remark.required = false;
+            if (isChange) {
+                lastDate.value = "";
+                remark.value = "";
+            }
+        }
     }
 
     function openDataLoginModal(index) {
@@ -1134,34 +1170,32 @@
             document.getElementById("dlDept").value = r.department;
             document.getElementById("dlComp").value = r.company;
             document.getElementById("dlLevel").value = r.level;
-            document.getElementById("dlDob").value = r.dob;
+            document.getElementById("dlDob").value = r.rawDob || "";
             document.getElementById("dlTel").value = r.tel;
             document.getElementById("dlAddr").value = r.address;
             document.getElementById("dlBranch").value = r.branch;
-            document.getElementById("dlStart").value = r.startDate;
+            document.getElementById("dlStart").value = r.rawStartDate || "";
             document.getElementById("dlInsStatus").value = r.insuranceStatus;
             document.getElementById("dlEmpStatus").value = r.empStatus;
             
-            // ข้อมูลใหม่
-            if(r.lastDate && r.lastDate !== "-") {
-                try {
-                    let p = r.lastDate.split('-');
-                    if(p.length === 3) document.getElementById("dlLastDate").value = r.lastDate;
-                } catch(e) {}
-            }
-            document.getElementById("dlRemark").value = r.remark;
+            document.getElementById("dlLastDate").value = r.rawLastDate || "";
+            document.getElementById("dlRemark").value = r.remark && r.remark !== "-" ? r.remark : "";
             document.getElementById("dlCheckHrHome").value = r.checkHrHome || "New";
 
             if(r.docUrl) {
                 document.getElementById("dlDocUrl").value = r.docUrl;
                 document.getElementById("dlDocPreview").innerHTML = `<a href="${r.docUrl}" target="_blank" class="badge bg-info text-dark text-decoration-none"><i class="bi bi-file-earmark-text"></i> ดูเอกสารที่มีอยู่แล้ว</a>`;
             }
+            toggleResignFields(false);
         } else {
             document.getElementById("dataLoginModalLabel").innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>เพิ่มข้อมูลพนักงานใหม่';
             document.getElementById("dlRowNumber").value = "";
             document.getElementById("dlInsStatus").value = "รอดำเนินการ";
             document.getElementById("dlEmpStatus").value = "ทำงาน";
+            document.getElementById("dlLastDate").value = "";
+            document.getElementById("dlRemark").value = "";
             document.getElementById("dlCheckHrHome").value = "New";
+            toggleResignFields(false);
         }
         var modal = new bootstrap.Modal(document.getElementById('dataLoginModal'));
         modal.show();
@@ -1172,13 +1206,12 @@
         var lastDate = document.getElementById("dlLastDate").value;
         var remark = document.getElementById("dlRemark").value;
 
-        // Validation กรณ๊ลาออก
         if (empStatus === 'ลาออก') {
             if (!lastDate || !remark.trim()) {
                 Swal.fire({
                     icon: 'warning', 
                     title: 'ข้อมูลไม่ครบถ้วน', 
-                    text: 'กรณีเปลี่ยนสถานะเป็น "ลาออก" กรุณาระบุ "วันที่ทำงานวันสุดท้าย" และ "หมายเหตุ" ให้ครบถ้วน'
+                    text: 'กรณีเปลี่ยนสถานะเป็น "ลาออก" กรุณาระบุ "วันที่ทำงานวันสุดท้าย" และ "สาเหตุการลาออก" ให้ครบถ้วน'
                 });
                 return; 
             }
@@ -1795,7 +1828,7 @@
         rows.forEach(tr => { if (tr.style.display !== 'none' && !tr.classList.contains("no-data-row")) { let idx = tr.getAttribute("data-index"); if (idx !== null && currentRecords[idx]) { let mainChk = tr.querySelector('.main-chk'); let anyChecked = document.querySelectorAll('.main-chk:checked').length > 0; if (!anyChecked || (mainChk && mainChk.checked)) { visibleRecords.push(currentRecords[idx]); } } } });
         if (visibleRecords.length === 0) { Swal.fire({icon: 'info', title: 'ไม่มีข้อมูล', text: 'ไม่พบข้อมูลที่กำลังแสดงอยู่เพื่อ Export (หรือคุณอาจไม่ได้ติ๊กเลือกข้อมูล)'}); return; }
 
-        let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1" style="border-collapse: collapse;"><thead><tr style="background-color: #4e54c8; color: #ffffff; font-weight: bold;"><th>ID Card</th><th>Employee ID</th><th>Name</th><th>Position</th><th>Company</th><th>Employee Status</th><th>วดป เกิด</th><th>Tel</th><th>ที่อยู่</th><th>สาขา</th><th>ประเภทการซื้อประกัน</th><th>เริ่มคุ้มครอง</th><th>สิ้นสุดคุ้มครอง</th></tr></thead><tbody>`;
+        let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1" style="border-collapse: collapse;"><thead><tr style="background-color: #4e54c8; color: #ffffff; font-weight: bold;"><th>ID Card</th><th>Employee ID</th><th>Name</th><th>Position</th><th>Company</th><th>สถานะการทำงาน</th><th>วดป เกิด</th><th>Tel</th><th>ที่อยู่</th><th>สาขา</th><th>ประเภทการซื้อประกัน</th><th>เริ่มคุ้มครอง</th><th>สิ้นสุดคุ้มครอง</th></tr></thead><tbody>`;
         visibleRecords.forEach(row => { tableHtml += `<tr><td style="mso-number-format:'\\@';">${row.idCard || '-'}</td><td style="mso-number-format:'\\@';">${row.empId || '-'}</td><td>${row.name || '-'}</td><td>${row.position || '-'}</td><td>${row.company || '-'}</td><td>${row.empStatus || '-'}</td><td>${row.dob || '-'}</td><td style="mso-number-format:'\\@';">${row.tel || '-'}</td><td>${row.address || '-'}</td><td>${row.branch || '-'}</td><td>${row.insuranceType || '-'}</td><td>${row.coverageStart || '-'}</td><td>${row.coverageEnd || '-'}</td></tr>`; });
         tableHtml += `</tbody></table></body></html>`;
 
