@@ -581,7 +581,7 @@
   </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz9yXZX3lVXhg5gIPJ3jKRMN_Oar9QTh0eNZu4rr2py7aegRSKuea9pmf0THzBfbeo/exec"; 
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxidpGSD-KjsavpLVFZZ-fvgt8yjc5SN2tN2wZr8PoLJtk0xK3HgzSaiCfyRI2E08gM/exec"; 
 
     const google = {
       script: {
@@ -1572,11 +1572,11 @@
               if (currentUserLevel !== 'HR' && currentUserLevel !== 'JMI' && record.status !== 'หมดอายุประกัน') {
                   hasMissingDocs = true;
                   let nameAttr = '';
-                  // Index HTML pass to missing function is based on COL_INS
-                  if(colIndex === 12) nameAttr = 'missingReqForm'; 
-                  else if(colIndex === 15) nameAttr = 'missingIdCopy'; 
-                  else if(colIndex === 16) nameAttr = 'missingBankBook'; 
-                  else if(colIndex === 24) nameAttr = 'missingOtherDoc';
+                  // Index HTML pass to missing function is based on updated Col Index
+                  if(colIndex === 13) nameAttr = 'missingReqForm'; 
+                  else if(colIndex === 16) nameAttr = 'missingIdCopy'; 
+                  else if(colIndex === 17) nameAttr = 'missingBankBook'; 
+                  else if(colIndex === 26) nameAttr = 'missingOtherDoc';
                   
                   htmlMissing += `<button type="button" class="btn btn-sm btn-secondary fw-normal emp-missing-doc me-2 mb-2" data-name="${nameAttr}" data-label="${label}"><i class="bi bi-plus me-1"></i>เพิ่ม${label}</button>`;
               } else {
@@ -1611,11 +1611,11 @@
           }
       };
 
-      processDoc(record.reqFormUrl, 'ใบคำขอซื้อ', record.rowNumber, 12);
+      processDoc(record.reqFormUrl, 'ใบคำขอซื้อ', record.rowNumber, 13);
       processSlips(record.slipUrl, record.rowNumber, record.status, record.slipStatus);
-      processDoc(record.idCopyUrl, 'สำเนาบัตรประชาชน', record.rowNumber, 15);
-      processDoc(record.bankBookUrl, 'หน้าสมุดบัญชี', record.rowNumber, 16);
-      processDoc(record.otherDocUrl, 'เอกสารอื่นๆ', record.rowNumber, 24);
+      processDoc(record.idCopyUrl, 'สำเนาบัตรประชาชน', record.rowNumber, 16);
+      processDoc(record.bankBookUrl, 'หน้าสมุดบัญชี', record.rowNumber, 17);
+      processDoc(record.otherDocUrl, 'เอกสารอื่นๆ', record.rowNumber, 26);
 
       htmlUploaded = htmlUploaded || '<span class="text-muted small">- ไม่มีเอกสารที่แนบไว้ -</span>';
       htmlMissing = htmlMissing || '<span class="text-muted small">- ไม่มีเอกสารที่ขาด -</span>';
