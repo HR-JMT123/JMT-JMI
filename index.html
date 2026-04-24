@@ -166,7 +166,8 @@
                   <div class="col-md-3"><label class="form-label small text-muted mb-1">ID Card</label><input type="text" id="idCard" name="idCard" class="form-control form-control-sm readonly-field" readonly></div>
                   <div class="col-md-6"><label class="form-label small text-muted mb-1">ชื่อ-นามสกุล</label><input type="text" id="name" name="name" class="form-control form-control-sm readonly-field" readonly></div>
                   <div class="col-md-6"><label class="form-label small text-muted mb-1">ตำแหน่ง</label><input type="text" id="position" name="position" class="form-control form-control-sm readonly-field" readonly></div>
-                  <div class="col-md-6"><label class="form-label small text-muted mb-1">สังกัด / แผนก</label><input type="text" id="department" name="department" class="form-control form-control-sm readonly-field" readonly></div>
+                  <div class="col-md-3"><label class="form-label small text-muted mb-1">แผนก</label><input type="text" id="department" name="department" class="form-control form-control-sm readonly-field" readonly></div>
+                  <div class="col-md-3"><label class="form-label small text-muted mb-1">สังกัด</label><input type="text" id="company" name="company" class="form-control form-control-sm readonly-field" readonly></div>
                 </div>
             </div>
 
@@ -580,7 +581,7 @@
   </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzN-PKF9Lz8Ot4OYcVHXeTTCY6w0o_ysMRfVMFOrtlMrXDKPPUgoRLC9lTH9V8pxuyy/exec"; 
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz9yXZX3lVXhg5gIPJ3jKRMN_Oar9QTh0eNZu4rr2py7aegRSKuea9pmf0THzBfbeo/exec"; 
 
     const google = {
       script: {
@@ -847,7 +848,7 @@
                  fetchTableData(result.idCard); 
               }
               
-              document.getElementById("idCard").value = result.idCard; document.getElementById("empId").value = result.empId; document.getElementById("name").value = result.name; document.getElementById("position").value = result.position; document.getElementById("department").value = result.department;
+              document.getElementById("idCard").value = result.idCard; document.getElementById("empId").value = result.empId; document.getElementById("name").value = result.name; document.getElementById("position").value = result.position; document.getElementById("department").value = result.department; document.getElementById("company").value = result.company || "";
               const setAutoFill = (id, value, allowEdit = false) => { const el = document.getElementById(id); if (el) { if (value && value !== "") { el.value = value; if ((currentUserLevel === 'EMP' || currentUserLevel === '') && allowEdit) { el.readOnly = false; el.classList.remove("readonly-field"); } else { el.readOnly = true; el.classList.add("readonly-field"); } } else { el.value = ""; el.readOnly = false; el.classList.remove("readonly-field"); } } };
               setAutoFill("dob", result.dob, true); setAutoFill("tel", result.tel, true); setAutoFill("address", result.address, true); setAutoFill("branch", result.branch, false); setAutoFill("startDate", result.startDate, false);
           };
@@ -1075,7 +1076,7 @@
             var eStatusClass = r.empStatus === 'ทำงาน' ? 'text-success' : 'text-danger';
             var iStatusClass = (r.insuranceStatus === 'ซื้อค้ำประกัน' || r.insuranceStatus === 'มีค้ำประกัน') ? 'text-success' : 'text-warning';
             if (r.insuranceStatus === 'ไม่ใช้ค้ำประกัน') iStatusClass = 'text-secondary';
-            var docBtn = (r.docUrl && r.docUrl.trim() !== "" && r.docUrl !== "-") ? `<button class="btn btn-sm btn-outline-info" onclick="viewDocument('${r.docUrl}')" title="ดูเอกสาร"><i class="bi bi-file-earmark-text"></i></button>` : `<span class="text-muted small">-</span>`;
+            var docBtn = (r.docUrl && r.docUrl.trim() !== "" && r.docUrl !== "-") ? `<button class="btn btn-sm btn-outline-info" onclick="viewDocument('${r.docUrl}')" title="ดูเอกสาร"><i class="bi bi-file-earmark-text"></i></button>` : `<span class="text-muted small fw-bold">-</span>`;
             
             var tr = document.createElement("tr");
             tr.innerHTML = `
@@ -1178,11 +1179,10 @@
             document.getElementById("dlInsStatus").value = r.insuranceStatus;
             document.getElementById("dlEmpStatus").value = r.empStatus;
             
-            // ข้อมูลใหม่
-            if(r.lastDate && r.lastDate !== "-") {
+            if(r.rawLastDate && r.rawLastDate !== "-") {
                 try {
-                    let p = r.lastDate.split('-');
-                    if(p.length === 3) document.getElementById("dlLastDate").value = r.lastDate;
+                    let p = r.rawLastDate.split('-');
+                    if(p.length === 3) document.getElementById("dlLastDate").value = r.rawLastDate;
                 } catch(e) {}
             }
             document.getElementById("dlRemark").value = r.remark && r.remark !== "-" ? r.remark : "";
@@ -1227,6 +1227,29 @@
         var originalHtml = btn.innerHTML;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังบันทึก...';
         btn.disabled = true;
+
+        var formData = {
+            rowNumber: document.getElementById("dlRowNumber").value,
+            idCard: document.getElementById("dlIdCard").value,
+            empId: document.getElementById("dlEmpId").value,
+            name: document.getElementById("dlName").value,
+            position: document.getElementById("dlPosition").value,
+            department: document.getElementById("dlDept").value,
+            company: document.getElementById("dlComp").value,
+            level: document.getElementById("dlLevel").value,
+            dob: document.getElementById("dlDob").value,
+            tel: document.getElementById("dlTel").value,
+            address: document.getElementById("dlAddr").value,
+            branch: document.getElementById("dlBranch").value,
+            startDate: document.getElementById("dlStart").value,
+            insuranceStatus: document.getElementById("dlInsStatus").value,
+            empStatus: empStatus,
+            lastDate: lastDate,
+            remark: remark,
+            checkHrHome: document.getElementById("dlCheckHrHome").value,
+            docUrl: document.getElementById("dlDocUrl").value,
+            newDoc: document.getElementById("dlDoc")
+        };
 
         google.script.run.withSuccessHandler(function(res) {
             btn.innerHTML = originalHtml; btn.disabled = false;
@@ -1549,10 +1572,11 @@
               if (currentUserLevel !== 'HR' && currentUserLevel !== 'JMI' && record.status !== 'หมดอายุประกัน') {
                   hasMissingDocs = true;
                   let nameAttr = '';
+                  // Index HTML pass to missing function is based on COL_INS
                   if(colIndex === 12) nameAttr = 'missingReqForm'; 
                   else if(colIndex === 15) nameAttr = 'missingIdCopy'; 
                   else if(colIndex === 16) nameAttr = 'missingBankBook'; 
-                  else if(colIndex === 25) nameAttr = 'missingOtherDoc';
+                  else if(colIndex === 24) nameAttr = 'missingOtherDoc';
                   
                   htmlMissing += `<button type="button" class="btn btn-sm btn-secondary fw-normal emp-missing-doc me-2 mb-2" data-name="${nameAttr}" data-label="${label}"><i class="bi bi-plus me-1"></i>เพิ่ม${label}</button>`;
               } else {
@@ -1591,7 +1615,7 @@
       processSlips(record.slipUrl, record.rowNumber, record.status, record.slipStatus);
       processDoc(record.idCopyUrl, 'สำเนาบัตรประชาชน', record.rowNumber, 15);
       processDoc(record.bankBookUrl, 'หน้าสมุดบัญชี', record.rowNumber, 16);
-      processDoc(record.otherDocUrl, 'เอกสารอื่นๆ', record.rowNumber, 25);
+      processDoc(record.otherDocUrl, 'เอกสารอื่นๆ', record.rowNumber, 24);
 
       htmlUploaded = htmlUploaded || '<span class="text-muted small">- ไม่มีเอกสารที่แนบไว้ -</span>';
       htmlMissing = htmlMissing || '<span class="text-muted small">- ไม่มีเอกสารที่ขาด -</span>';
@@ -1622,7 +1646,8 @@
                 <div class="col-md-6"><label class="small text-muted">วันเกิด:</label><input type="date" id="editDob" class="form-control form-control-sm" value="${record.rawDob}"></div>
                 <div class="col-12"><label class="small text-muted">ที่อยู่:</label><textarea id="editAddress" class="form-control form-control-sm" rows="2">${record.address}</textarea></div>
                 <div class="col-md-6"><label class="small text-muted">เบอร์โทรศัพท์:</label><input type="text" id="editTel" class="form-control form-control-sm" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" value="${record.tel}"></div>
-                <div class="col-md-6"><label class="small text-muted">แผนก / สังกัด:</label><input type="text" id="editDepartment" class="form-control form-control-sm" value="${record.department}"></div>
+                <div class="col-md-6"><label class="small text-muted">แผนก:</label><input type="text" id="editDepartment" class="form-control form-control-sm" value="${record.department}"></div>
+                <div class="col-md-6"><label class="small text-muted">สังกัด:</label><input type="text" id="editCompany" class="form-control form-control-sm" value="${record.company}"></div>
                 <div class="col-md-6"><label class="small text-muted">ตำแหน่ง:</label><input type="text" id="editPosition" class="form-control form-control-sm" value="${record.position}"></div>
                 <div class="col-md-6"><label class="small text-muted">สาขา:</label><input type="text" id="editBranch" class="form-control form-control-sm" value="${record.branch}"></div>
                 <div class="col-md-6"><label class="small text-muted">วันเริ่มงาน:</label><input type="date" id="editStartDate" class="form-control form-control-sm" value="${record.rawStartDate}"></div>
@@ -1668,7 +1693,8 @@
                 <div class="col-md-6"><small class="text-muted d-block">วันเกิด:</small> <span>${record.dob}</span></div>
                 <div class="col-12"><small class="text-muted d-block">ที่อยู่:</small> <span>${record.address}</span></div>
                 <div class="col-md-6"><small class="text-muted d-block">เบอร์โทรศัพท์:</small> <span>${record.tel}</span></div>
-                <div class="col-md-6"><small class="text-muted d-block">แผนก / สังกัด:</small> <span>${record.department}</span></div>
+                <div class="col-md-6"><small class="text-muted d-block">แผนก:</small> <span>${record.department}</span></div>
+                <div class="col-md-6"><small class="text-muted d-block">สังกัด:</small> <span>${record.company}</span></div>
                 <div class="col-md-6"><small class="text-muted d-block">ตำแหน่ง:</small> <span>${record.position}</span></div>
                 <div class="col-md-6"><small class="text-muted d-block">สาขา:</small> <span>${record.branch}</span></div>
                 <div class="col-md-6"><small class="text-muted d-block">วันเริ่มงาน:</small> <span>${record.startDate}</span></div>
@@ -1734,7 +1760,7 @@
 
     function saveFullRecord(rowNumber) {
         var btn = document.querySelector("#detailModalFooter .btn-success"); var originalText = btn.innerHTML; btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังบันทึก...'; btn.disabled = true;
-        var data = { name: document.getElementById("editName") ? document.getElementById("editName").value : "", empId: document.getElementById("editEmpId") ? document.getElementById("editEmpId").value : "", idCard: document.getElementById("editIdCard") ? document.getElementById("editIdCard").value : "", dob: document.getElementById("editDob") ? document.getElementById("editDob").value : "", address: document.getElementById("editAddress") ? document.getElementById("editAddress").value : "", tel: document.getElementById("editTel") ? document.getElementById("editTel").value : "", department: document.getElementById("editDepartment") ? document.getElementById("editDepartment").value : "", position: document.getElementById("editPosition") ? document.getElementById("editPosition").value : "", branch: document.getElementById("editBranch") ? document.getElementById("editBranch").value : "", startDate: document.getElementById("editStartDate") ? document.getElementById("editStartDate").value : "", coverageStart: document.getElementById("editCovStart") ? document.getElementById("editCovStart").value : "", coverageEnd: document.getElementById("editCovEnd") ? document.getElementById("editCovEnd").value : "", cancelStatus: document.getElementById("editCancelStatus") ? document.getElementById("editCancelStatus").value : "", cancelDate: document.getElementById("editCancelDate") ? document.getElementById("editCancelDate").value : "", slipStatus: document.getElementById("editSlipStatus") ? document.getElementById("editSlipStatus").value : "" };
+        var data = { name: document.getElementById("editName") ? document.getElementById("editName").value : "", empId: document.getElementById("editEmpId") ? document.getElementById("editEmpId").value : "", idCard: document.getElementById("editIdCard") ? document.getElementById("editIdCard").value : "", dob: document.getElementById("editDob") ? document.getElementById("editDob").value : "", address: document.getElementById("editAddress") ? document.getElementById("editAddress").value : "", tel: document.getElementById("editTel") ? document.getElementById("editTel").value : "", department: document.getElementById("editDepartment") ? document.getElementById("editDepartment").value : "", company: document.getElementById("editCompany") ? document.getElementById("editCompany").value : "", position: document.getElementById("editPosition") ? document.getElementById("editPosition").value : "", branch: document.getElementById("editBranch") ? document.getElementById("editBranch").value : "", startDate: document.getElementById("editStartDate") ? document.getElementById("editStartDate").value : "", coverageStart: document.getElementById("editCovStart") ? document.getElementById("editCovStart").value : "", coverageEnd: document.getElementById("editCovEnd") ? document.getElementById("editCovEnd").value : "", cancelStatus: document.getElementById("editCancelStatus") ? document.getElementById("editCancelStatus").value : "", cancelDate: document.getElementById("editCancelDate") ? document.getElementById("editCancelDate").value : "", slipStatus: document.getElementById("editSlipStatus") ? document.getElementById("editSlipStatus").value : "" };
         google.script.run.withSuccessHandler(function(res) {
             btn.innerHTML = originalText; btn.disabled = false;
             if(res === 'success') { Swal.fire({icon: 'success', title: 'บันทึกสำเร็จ', showConfirmButton: false, timer: 1500}); fetchHRTableData(); } 
@@ -1827,10 +1853,10 @@
         if (response === "success") {
           Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', text: 'ข้อมูลและเอกสารของคุณถูกส่งเข้าระบบเรียบร้อยแล้ว', confirmButtonColor: '#11998e'
           }).then((result) => {
-             var tempIdCard = document.getElementById("idCard").value; var tempEmpId = document.getElementById("empId").value; var tempName = document.getElementById("name").value; var tempPosition = document.getElementById("position").value; var tempDepartment = document.getElementById("department").value;
+             var tempIdCard = document.getElementById("idCard").value; var tempEmpId = document.getElementById("empId").value; var tempName = document.getElementById("name").value; var tempPosition = document.getElementById("position").value; var tempDepartment = document.getElementById("department").value; var tempCompany = document.getElementById("company").value;
              var tempDob = document.getElementById("dob").value; var tempTel = document.getElementById("tel").value; var tempAddress = document.getElementById("address").value; var tempBranch = document.getElementById("branch").value; var tempStartDate = document.getElementById("startDate").value;
              document.getElementById("myForm").reset();
-             document.getElementById("idCard").value = tempIdCard; document.getElementById("empId").value = tempEmpId; document.getElementById("name").value = tempName; document.getElementById("position").value = tempPosition; document.getElementById("department").value = tempDepartment;
+             document.getElementById("idCard").value = tempIdCard; document.getElementById("empId").value = tempEmpId; document.getElementById("name").value = tempName; document.getElementById("position").value = tempPosition; document.getElementById("department").value = tempDepartment; document.getElementById("company").value = tempCompany;
              document.getElementById("dob").value = tempDob; document.getElementById("tel").value = tempTel; document.getElementById("address").value = tempAddress; document.getElementById("branch").value = tempBranch; document.getElementById("startDate").value = tempStartDate;
              
              let preview = document.getElementById('slipPreview'); if(preview) preview.style.display = 'none';
