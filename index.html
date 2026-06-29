@@ -282,6 +282,10 @@
             </div>
             <div class="col-lg-6 col-md-12 text-lg-end text-start mt-3 mt-lg-0">
                 <div class="d-flex flex-wrap align-items-center justify-content-lg-end gap-2 mb-1">
+                    <div class="input-group input-group-sm" style="max-width: 180px;">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" id="searchHrIdCard" class="form-control border-start-0" placeholder="ค้นหาเลข ปชช..." onkeyup="applyAllFilters()">
+                    </div>
                     <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="clearAllFilters()" title="เคลียร์ตัวกรอง" style="font-size: 0.8rem;"><i class="bi bi-eraser me-1"></i>เคลียร์</button>
                     <div class="d-inline-flex align-items-center gap-1">
                         <i class="bi bi-calendar-range text-muted"></i>
@@ -890,6 +894,7 @@
                      if(document.getElementById("btnStatusExp")) document.getElementById("btnStatusExp").style.display = "";
                  }
                  document.getElementById("dateStart").value = ""; document.getElementById("dateEnd").value = ""; document.getElementById("dateFilterType").value = "0"; document.querySelectorAll('.col-filter').forEach(inp => inp.value = "");
+                 if(document.getElementById("searchHrIdCard")) document.getElementById("searchHrIdCard").value = "";
                  filterByStatus('ทั้งหมด', document.getElementById('btnStatusAll'));
                  document.getElementById("hrSection").style.display = "block"; switchHRTab('insurance'); fetchHRTableData();
               } else {
@@ -975,9 +980,12 @@
 
     function applyAllFilters() {
         let tbody = document.getElementById("hrTableBody"); let tr = tbody.getElementsByTagName("tr"); let dateStart = document.getElementById("dateStart").value; let dateEnd = document.getElementById("dateEnd").value; let dateColIndex = parseInt(document.getElementById("dateFilterType").value) || 0; let colFilters = document.querySelectorAll('.col-filter'); let visibleCount = 0;
+        let searchIdCard = document.getElementById("searchHrIdCard") ? document.getElementById("searchHrIdCard").value.toUpperCase() : "";
         for (let i = 0; i < tr.length; i++) {
             if (tr[i].classList.contains("no-data-row")) continue; let td = tr[i].getElementsByTagName("td"); let showRow = true; let rowStatus = tr[i].getAttribute("data-status");
+            let rowIdCard = tr[i].getAttribute("data-idcard") || "";
             if (currentStatusFilter !== 'ทั้งหมด' && rowStatus !== currentStatusFilter) { showRow = false; }
+            if (showRow && searchIdCard && rowIdCard.toUpperCase().indexOf(searchIdCard) === -1) { showRow = false; }
             if (showRow && (dateStart || dateEnd)) {
                 let dateText = td[dateColIndex].innerText.trim(); 
                 if (dateText !== "-" && dateText !== "") {
@@ -1032,7 +1040,7 @@
               else if (row.status === 'รอแจ้งออก' && (row.cancelStatus || '') !== '' && (row.cancelDate || '') !== '' && row.cancelDate !== '-') { chkHtml = `<input type="checkbox" class="form-check-input select-out-chk" style="display:none;" value="${row.rowNumber}" onclick="event.stopPropagation()">`; }
           }
           var tr = document.createElement("tr"); tr.style.cursor = "pointer"; tr.onclick = function() { showDetails(index); };
-          tr.setAttribute("data-status", row.status); tr.setAttribute("data-slip-status", row.slipStatus || ""); tr.setAttribute("data-index", index); 
+          tr.setAttribute("data-status", row.status); tr.setAttribute("data-slip-status", row.slipStatus || ""); tr.setAttribute("data-index", index); tr.setAttribute("data-idcard", row.idCard || ""); 
           tr.innerHTML = `<td><div class="date-cell-wrapper">${mainChkHtml}${chkHtml} <span>${row.timestamp}</span></div></td><td><span class="text-secondary">${row.empId}</span></td><td class="text-start">${row.name}</td><td><span class="text-success">${row.coverageStart}</span></td><td><span class="text-danger">${row.coverageEnd}</span></td><td><span class="${remainingDaysClass}">${displayRemainingDays}</span></td><td>${statusBadge}</td><td><span class="text-dark">${row.cancelDate || '-'}</span></td><td class="text-start">${docBadge}</td>`;
           tbody.appendChild(tr);
         });
@@ -1922,6 +1930,7 @@
     
     function clearAllFilters() {
         document.getElementById("dateStart").value = ""; document.getElementById("dateEnd").value = ""; document.getElementById("dateFilterType").value = "0"; document.querySelectorAll('.col-filter').forEach(inp => inp.value = "");
+        if(document.getElementById("searchHrIdCard")) document.getElementById("searchHrIdCard").value = "";
         let btnAll = document.getElementById('btnStatusAll'); if(btnAll) { filterByStatus('ทั้งหมด', btnAll); } else { applyAllFilters(); }
     }
   </script>
